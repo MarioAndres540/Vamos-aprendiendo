@@ -1,0 +1,3 @@
+repository "Vamos aprendiendo/Vamos aprendiendo@4673615583908@cloud"
+  path "/"
+    smartbranch "/main/develop"
