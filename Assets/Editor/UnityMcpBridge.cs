@@ -92,7 +92,7 @@ namespace Antigravity.MCP
             }
         }
 
-        private static T RunOnMainThread<T>(Func<T> action, int timeoutMs = 2000)
+        private static T RunOnMainThread<T>(Func<T> action, int timeoutMs = 5000)
         {
             var tcs = new TaskCompletionSource<T>();
             EditorApplication.delayCall += () =>
@@ -107,14 +107,11 @@ namespace Antigravity.MCP
                 }
             };
 
-            // Forzar ciclo de actualización del editor si está en segundo plano
-            EditorApplication.QueuePlayerLoopUpdate();
-
             if (tcs.Task.Wait(timeoutMs))
             {
                 return tcs.Task.Result;
             }
-            throw new TimeoutException("Unity Editor está en pausa o en segundo plano. Haz clic en la ventana de Unity para activar el hilo principal.");
+            throw new TimeoutException("Unity Editor no respondió a tiempo. Asegúrate de que la ventana de Unity no esté congelada.");
         }
 
         private static void ProcessRequest(HttpListenerContext context)
@@ -147,12 +144,11 @@ namespace Antigravity.MCP
                 }
                 else if (path == "/refresh")
                 {
-                    EditorApplication.delayCall += () =>
+                    responseJson = RunOnMainThread(() =>
                     {
                         AssetDatabase.Refresh();
-                    };
-                    EditorApplication.QueuePlayerLoopUpdate();
-                    responseJson = "{\"status\":\"refresh_queued\"}";
+                        return "{\"status\":\"refreshed\"}";
+                    }, 10000);
                 }
                 else if (path == "/scene/info")
                 {
@@ -170,6 +166,38 @@ namespace Antigravity.MCP
                         sb.Append("]}");
                         return sb.ToString();
                     });
+                }
+                else if (path == "/scene/organize")
+                {
+                    responseJson = RunOnMainThread(() =>
+                    {
+                        Project.EditorTools.SceneHierarchyOrganizer.OrganizeActiveScene();
+                        return "{\"status\":\"success\",\"message\":\"Jerarquía organizada correctamente.\"}";
+                    }, 5000);
+                }
+                else if (path == "/scene/generate-login")
+                {
+                    responseJson = RunOnMainThread(() =>
+                    {
+                        VamosAprendiendo.EditorTools.LoginSceneGenerator.GenerateLoginScene();
+                        return "{\"status\":\"success\",\"message\":\"Escena LoginScene creada exitosamente y configurada en Build Settings.\"}";
+                    }, 10000);
+                }
+                else if (path == "/scene/generate-challenges")
+                {
+                    responseJson = RunOnMainThread(() =>
+                    {
+                        VamosAprendiendo.EditorTools.ChallengeScenesCreator.CreateAllChallengeScenes();
+                        return "{\"status\":\"success\",\"message\":\"Todas las escenas de desafíos fueron creadas con éxito.\"}";
+                    }, 15000);
+                }
+                else if (path == "/camera/fix")
+                {
+                    responseJson = RunOnMainThread(() =>
+                    {
+                        VamosAprendiendo.EditorTools.CameraSetupTool.FixCameraInBaseSceneDirectly();
+                        return "{\"status\":\"success\",\"message\":\"Cámara configurada y guardada en BaseScene.\"}";
+                    }, 10000);
                 }
                 else
                 {

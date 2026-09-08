@@ -4,85 +4,181 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour
 {
-    [Header("Movimiento")]
-    [SerializeField] private float moveSpeed = 5f;
-    [SerializeField] private float rotationSpeed = 10f;
+    [Header("Movement Settings")]
+    [Tooltip("Velocidad máxima de movimiento")]
+    [SerializeField] private float moveSpeed = 6.0f;
 
-    [Header("Gravedad y suelo")]
-   [SerializeField] private float gravity = -9.81f;
-[SerializeField] private Transform groundCheck;
-[SerializeField] private float groundDistance = 0.2f;
-[SerializeField] private LayerMask groundMask;
+    [Tooltip("Velocidad de aceleración y desaceleración (suavizado de inercia)")]
+    [SerializeField] private float speedChangeRate = 12.0f;
 
-    [Header("Cámara")]
+    [Header("Rotation Settings")]
+    [Tooltip("Tiempo de amortiguación para el giro (0.10s a 0.15s es el estándar de oro para control suave)")]
+    [Range(0.05f, 0.3f)]
+    [SerializeField] private float rotationSmoothTime = 0.12f;
+
+    [Header("Jump & Gravity")]
+    [Tooltip("Altura del salto en metros")]
+    [SerializeField] private float jumpHeight = 1.25f;
+
+    [Tooltip("Fuerza de gravedad")]
+    [SerializeField] private float gravity = -16.0f;
+
+    [Tooltip("Gravedad cuando el personaje está en el suelo para mantenerlo pegado a rampas")]
+    [SerializeField] private float groundedGravity = -2.0f;
+
+    [Header("Camera Reference")]
     [SerializeField] private Transform cameraTransform;
 
-    private CharacterController controller;
-    private Vector2 inputMovement;
-    private Vector3 verticalVelocity;
-    private bool isGrounded;
+    // References
+    private CharacterController _controller;
+
+    // State
+    private Vector2 _inputMovement;
+    private bool _jumpRequested;
+    private float _currentSpeed;
+    private float _targetRotation;
+    private float _rotationVelocity;
+    private float _verticalVelocity;
+
+    public bool IsMoving => _inputMovement.sqrMagnitude > 0.01f || (_controller != null && _controller.velocity.sqrMagnitude > 0.1f);
+    public Vector2 InputMovement => _inputMovement;
 
     private void Awake()
     {
-        controller = GetComponent<CharacterController>();
-        if (cameraTransform == null && Camera.main != null)
+        _controller = GetComponent<CharacterController>();
+        SetupCameraFollow();
+    }
+
+    private void Start()
+    {
+        SetupCameraFollow();
+    }
+
+    private void SetupCameraFollow()
+    {
+        if (Camera.main != null)
         {
             cameraTransform = Camera.main.transform;
+            var smoothCam = Camera.main.GetComponent<VamosAprendiendo.Gameplay.SmoothThirdPersonCamera>();
+            if (smoothCam == null)
+            {
+                smoothCam = Camera.main.gameObject.AddComponent<VamosAprendiendo.Gameplay.SmoothThirdPersonCamera>();
+            }
+            smoothCam.SetTarget(this.transform);
         }
     }
 
     private void Update()
     {
-        HandleMovementAndGravity();
+        CheckJumpInput();
+        ApplyGravity();
+        ApplyMovementAndRotation();
     }
 
-    private void HandleMovementAndGravity()
+    private void CheckJumpInput()
     {
-        isGrounded = controller.isGrounded;
-
-        // Mantener al jugador pegado al suelo si está en tierra
-        if (isGrounded && verticalVelocity.y < 0f)
+#if ENABLE_INPUT_SYSTEM
+        if (Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame)
         {
-            verticalVelocity.y = -2f;
+            _jumpRequested = true;
+        }
+
+        if (Gamepad.current != null && Gamepad.current.buttonSouth.wasPressedThisFrame)
+        {
+            _jumpRequested = true;
+        }
+#endif
+    }
+
+    private void ApplyGravity()
+    {
+        if (_controller.isGrounded)
+        {
+            if (_verticalVelocity < 0.0f)
+            {
+                _verticalVelocity = groundedGravity;
+            }
+
+            // Realizar salto si fue solicitado y estamos en el suelo
+            if (_jumpRequested)
+            {
+                _verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * gravity);
+                _jumpRequested = false;
+            }
         }
         else
         {
-            verticalVelocity.y += gravity * Time.deltaTime;
+            // Aplicar aceleración por gravedad en el aire
+            _verticalVelocity += gravity * Time.deltaTime;
+            _jumpRequested = false;
         }
+    }
 
-        // Calcular dirección con respecto a la cámara (o mundo si no hay cámara)
-        Vector3 moveDirection = Vector3.zero;
-        if (inputMovement.sqrMagnitude > 0.01f)
+    private void ApplyMovementAndRotation()
+    {
+        float targetSpeed = 0f;
+        Vector3 targetDirection = Vector3.zero;
+
+        // 1. Calcular dirección de movimiento relativa a la orientación de la cámara
+        if (_inputMovement.sqrMagnitude > 0.01f)
         {
-            if (cameraTransform != null)
+            targetSpeed = moveSpeed * Mathf.Clamp01(_inputMovement.magnitude);
+
+            Transform cam = cameraTransform != null ? cameraTransform : (Camera.main != null ? Camera.main.transform : null);
+
+            if (cam != null)
             {
-                Vector3 camForward = cameraTransform.forward;
-                Vector3 camRight = cameraTransform.right;
+                Vector3 camForward = cam.forward;
+                Vector3 camRight = cam.right;
+
                 camForward.y = 0f;
                 camRight.y = 0f;
                 camForward.Normalize();
                 camRight.Normalize();
 
-                moveDirection = (camForward * inputMovement.y + camRight * inputMovement.x).normalized;
+                targetDirection = (camForward * _inputMovement.y + camRight * _inputMovement.x).normalized;
             }
             else
             {
-                moveDirection = new Vector3(inputMovement.x, 0f, inputMovement.y).normalized;
+                targetDirection = new Vector3(_inputMovement.x, 0f, _inputMovement.y).normalized;
             }
 
-            // Rotar hacia la dirección del movimiento
-            float targetAngle = Mathf.Atan2(moveDirection.x, moveDirection.z) * Mathf.Rad2Deg;
-            Quaternion targetRotation = Quaternion.Euler(0f, targetAngle, 0f);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+            // 2. Giro suave del personaje (SmoothDampAngle)
+            _targetRotation = Mathf.Atan2(targetDirection.x, targetDirection.z) * Mathf.Rad2Deg;
+            float smoothYaw = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetRotation, ref _rotationVelocity, rotationSmoothTime);
+            transform.rotation = Quaternion.Euler(0.0f, smoothYaw, 0.0f);
         }
 
-        // COMBINAR movimiento y gravedad en una ÚNICA llamada a controller.Move
-        Vector3 finalVelocity = (moveDirection * moveSpeed) + verticalVelocity;
-        controller.Move(finalVelocity * Time.deltaTime);
+        // 3. Aceleración e inercia suave
+        _currentSpeed = Mathf.Lerp(_currentSpeed, targetSpeed, Time.deltaTime * speedChangeRate);
+        if (Mathf.Abs(_currentSpeed) < 0.01f) _currentSpeed = 0f;
+
+        // 4. Mover CharacterController
+        Vector3 movementVector = (targetDirection * _currentSpeed) + new Vector3(0.0f, _verticalVelocity, 0.0f);
+        _controller.Move(movementVector * Time.deltaTime);
     }
 
+    // Input System Callbacks
     public void OnMove(InputValue value)
     {
-        inputMovement = value.Get<Vector2>();
+        _inputMovement = value.Get<Vector2>();
+    }
+
+    public void OnJump(InputValue value)
+    {
+        if (value.isPressed)
+        {
+            _jumpRequested = true;
+        }
+    }
+
+    public void SetInputMovement(Vector2 input)
+    {
+        _inputMovement = input;
+    }
+
+    public void RequestJump()
+    {
+        _jumpRequested = true;
     }
 }

@@ -23,8 +23,54 @@ El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1
   4. **Creación de Material URP:** Crear en `Assets/_Project/Art/Materials/` (ej: `M_Temple.mat`) con shader `Universal Render Pipeline/Lit` (o `Unlit`).
   5. **Asignación:** Asignar *Base Color* a `Base Map`, *Normal Map* a `Normal Map`, ajustar *Smoothness* a `0.0 - 0.1` y aplicar al modelo en escena.
 
-### Pendiente General
-- **Mecánicas de Juego:** Interacciones básicas, límites de la plataforma y animaciones de personaje.
+---
+
+## [0.3.0] - 2026-09-08
+
+### Agregado
+- **Pantalla de Carga Interactiva y Asíncrona ([LoginUI.cs](file:///E:/SENA/Proyecto%20productivo/Vamos%20aprendiendo/Assets/_Project/Scripts/UI/LoginUI.cs)):**
+  - Sistema de transición con `SceneManager.LoadSceneAsync` hacia `BaseScene`.
+  - Tarjeta central con estética *Glassmorphism*, fondo translúcido y bordes iluminados.
+  - Spinner geométrico animado con rotación constante a 360°/s.
+  - Barra de progreso interactiva con llenado horizontal suave simulado de 0% a 100%.
+  - Contador numérico de porcentaje en tiempo real y textos informativos dinámicos de aprendizaje.
+- **Salto para el Personaje ([PlayerController.cs](file:///E:/SENA/Proyecto%20productivo/Vamos%20aprendiendo/Assets/_Project/Scripts/Gameplay/Player/PlayerController.cs)):**
+  - Mecánica de salto ágil (`jumpHeight = 1.25m`) mediante la Barra Espaciadora (`Space`), botón sur de Gamepad y eventos del nuevo Input System.
+  - Detección estricta de suelo (`CharacterController.isGrounded`) y cálculo de velocidad vertical con aceleración por gravedad.
+- **Sistema de Cámara en Tercera Persona Avanzado ([SmoothThirdPersonCamera.cs](file:///E:/SENA/Proyecto%20productivo/Vamos%20aprendiendo/Assets/_Project/Scripts/Gameplay/Camera/SmoothThirdPersonCamera.cs)):**
+  - **Órbita con Clic Derecho:** Rotación libre de 360° en horizontal y vertical con límites de inclinación (*Pitch* entre `-12°` y `70°`).
+  - **Zoom con Rueda del Ratón:** Ajuste de distancia suave entre `2.5m` (primer plano) y `20m` (vista panorámica).
+  - **Auto-Alineación Detrás del Personaje:** Reubicación automática y suave de la cámara detrás de la espalda del jugador al moverse o girar en 180° (teclas **A, D, S, W**).
+  - **Auto-Corrección de Perspectiva:** Detección y ajuste a modo perspectiva (`orthographic = false`, FOV `60°`) al iniciar la escena.
+- **Carrusel de Personajes Multi-Generacional ([CharacterCarouselUI.cs](file:///E:/SENA/Proyecto%20productivo/Vamos%20aprendiendo/Assets/_Project/Scripts/UI/CharacterCarouselUI.cs)):**
+  - Transición suave cada 4 segundos entre pares de personajes adaptados (Niños: `boy`/`gril` ➔ Adultos: `men`/`woman` ➔ Adultos Mayores: `old-men`/`old-woman`).
+  - Micro-animación de respiración / flotación (*idle breathing*) en reposo.
+- **Escenas de Desafíos Educativos ([ChallengeScenesCreator.cs](file:///E:/SENA/Proyecto%20productivo/Vamos%20aprendiendo/Assets/Editor/ChallengeScenesCreator.cs)):**
+  - Creador automatizado de las 5 escenas de minijuegos en `Assets/_Project/Scenes/Challenges/`:
+    - `MathOperation_2D.unity`
+    - `NumberTrace_2D.unity`
+    - `PlatformJump_25D.unity`
+    - `Maze_3D.unity`
+    - `Memory_3D.unity`
+- **Herramientas de Editor (Tools):**
+  - `Tools > Scenes > Create or Rebuild Login Scene` ([LoginSceneGenerator.cs](file:///E:/SENA/Proyecto%20productivo/Vamos%20aprendiendo/Assets/Editor/LoginSceneGenerator.cs)).
+  - `Tools > Environment > Scale Environment x1.5` ([SceneEnvironmentScaler.cs](file:///E:/SENA/Proyecto%20productivo/Vamos%20aprendiendo/Assets/Editor/SceneEnvironmentScaler.cs)) para escalar el entorno sin afectar al jugador.
+  - `Tools > Camera > Auto-Fix and Bind Camera to Player` ([CameraSetupTool.cs](file:///E:/SENA/Proyecto%20productivo/Vamos%20aprendiendo/Assets/Editor/CameraSetupTool.cs)).
+
+### Arreglado
+- **Compatibilidad Exclusiva con New Input System:**
+  - Eliminadas todas las llamadas residuales a `UnityEngine.Input` (Legacy) en scripts de gameplay, resolviendo el `InvalidOperationException: You are trying to read Input using the UnityEngine.Input class, but you have switched active Input handling to Input System package`.
+  - Migrada toda la lectura de ratón a `UnityEngine.InputSystem.Mouse.current`.
+- **Cámara Fija / Bloqueada en BaseScene:**
+  - Corregido el seguimiento de cámara en `BaseScene.unity` mediante vinculación automática del target `Player` en tiempo de ejecución.
+- **Conflictos de Compilación C#:**
+  - Corregida la ambigüedad `Object` vs `System.Object` utilizando `UnityEngine.Object.FindAnyObjectByType`.
+  - Resueltos conflictos de variables de ámbito local en [LoginSceneGenerator.cs](file:///E:/SENA/Proyecto%20productivo/Vamos%20aprendiendo/Assets/Editor/LoginSceneGenerator.cs).
+
+### Cambiado
+- **Estructura y Nomenclatura de Escenas:**
+  - Renombrada la escena central `SampleScene.unity` a [BaseScene.unity](file:///E:/SENA/Proyecto%20productivo/Vamos%20aprendiendo/Assets/_Project/Scenes/BaseScene.unity) y reubicada en `Assets/_Project/Scenes/`.
+  - Actualizados los índices de compilación en `EditorBuildSettings` (Índice 0: `LoginScene`, Índice 1: `BaseScene`, Índices 2..6: Desafíos).
 
 ---
 
@@ -46,7 +92,6 @@ El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1
 - **Diagnóstico y Calibración de Cinemachine ([SampleScene.unity](file:///E:/SENA/Proyecto%20productivo/Vamos%20aprendiendo/Assets/Scenes/SampleScene.unity)):**
   - Identificada la causa de la orientación lateral de la cámara (`Rotation Control: None` a 80°); documentada la configuración de `Rotation Composer` con compensación vertical de objetivo (`Target Offset: Y = 1.0 - 1.2`) y modo de seguimiento `Simple Follow With World Up`.
   - Identificada y corregida la causa del hundimiento visual del personaje: ajuste del centro en `CharacterController` (`Center: Y = 0` para coincidir con el pivote central de la cápsula de Unity).
-
 
 ---
 
