@@ -92,7 +92,7 @@ namespace Antigravity.MCP
             }
         }
 
-        private static T RunOnMainThread<T>(Func<T> action, int timeoutMs = 5000)
+        private static T RunOnMainThread<T>(Func<T> action, int timeoutMs = 15000)
         {
             var tcs = new TaskCompletionSource<T>();
             EditorApplication.delayCall += () =>
@@ -198,6 +198,32 @@ namespace Antigravity.MCP
                         VamosAprendiendo.EditorTools.CameraSetupTool.FixCameraInBaseSceneDirectly();
                         return "{\"status\":\"success\",\"message\":\"Cámara configurada y guardada en BaseScene.\"}";
                     }, 10000);
+                }
+                else if (path == "/bridge/validate" || path == "/scene/validate-bridge")
+                {
+                    responseJson = RunOnMainThread(() =>
+                    {
+                        string report = Project.EditorTools.BridgeSetupValidator.ValidateAndFixBridges();
+                        // Escapar comillas y saltos de línea para JSON seguro
+                        string safeReport = report.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\r", "").Replace("\n", "\\n");
+                        return $"{{\"status\":\"success\",\"report\":\"{safeReport}\"}}";
+                    }, 15000);
+                }
+                else if (path == "/lantern/setup" || path == "/lanterns/setup")
+                {
+                    responseJson = RunOnMainThread(() =>
+                    {
+                        Project.EditorTools.LanternGlowSetupTool.SetupJapaneseLanterns();
+                        return "{\"status\":\"success\",\"message\":\"Glowing Japanese Lanterns configuradas exitosamente con mapa de emisión, normal map y luces puntuales.\"}";
+                    }, 20000);
+                }
+                else if (path == "/pause-menu/setup" || path == "/pause/setup")
+                {
+                    responseJson = RunOnMainThread(() =>
+                    {
+                        VamosAprendiendo.EditorTools.PauseMenuSetupTool.SetupPauseMenu();
+                        return "{\"status\":\"success\",\"message\":\"Menú de pausa reconstruido limpiamente en BaseScene con la imagen grande (720x720).\"}";
+                    }, 15000);
                 }
                 else
                 {
