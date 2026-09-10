@@ -24,6 +24,27 @@ El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1
 
 ---
 
+## [0.5.0] - 2026-09-10
+
+### Agregado
+- **Paquetes de Efectos Visuales y Partículas (VFX):**
+  - **Hovl Studio - Magic Effects Pack (`Assets/Hovl Studio/Magic effects pack/`):** Colección de efectos de partículas mágicas y visuales para ambientación y retroalimentación interactiva en el mundo.
+  - **Reversed Interactive - The Portal Collection (`Assets/Reversed Interactive/The Portal Collection/`):** Modelos, prefabs y shaders de portales mágicos para zonas de transición y desafíos.
+- **Librería de Audio y Efectos Sonoros (SFX):**
+  - **25 RPG Game Tracks (`Assets/_Project/Audio/SFX/25 Rpg Game Tracks/`):** Repertorio de pistas musicales de temática RPG para ambientación y exploración.
+  - **Casual Game Sounds U6 (`Assets/_Project/Audio/SFX/Casual Game Sounds U6/`):** Banco de efectos de audio casuales optimizados para Unity 6 (sonidos de interfaz, interacción, saltos y recompensas).
+- **Colección de Modelos 3D Estilizados:**
+  - **PixitGames - PixitUnderseaCollection (`Assets/_Project/PixitGames/Pixit3D/PixitUnderseaCollection/`):** Modelos 3D temáticos low-poly para expandir la escenografía y complementar la identidad visual del juego.
+
+### Cambiado
+- **Ajustes en Escena Principal ([BaseScene.unity](file:///E:/SENA/Proyecto%20productivo/Vamos%20aprendiendo/Assets/_Project/Scenes/BaseScene.unity)):**
+  - Actualización del montaje del entorno con los nuevos componentes y assets integrados.
+- **Dependencias del Proyecto (`Packages/manifest.json`):**
+  - Actualizado el paquete `com.unity.visualscripting` a la versión `1.9.12`.
+  - Configuración y ajuste del asset de fuente fallback de TextMesh Pro (`LiberationSans SDF - Fallback.asset`).
+
+---
+
 ## [0.4.0] - 2026-09-09
 
 ### Agregado
