@@ -108,28 +108,50 @@ namespace VamosAprendiendo.UI
         {
             if (_isLoading) return;
 
-            string user = usernameInput != null ? usernameInput.text.Trim() : "";
-            StartCoroutine(PerformLoginSequence(string.IsNullOrEmpty(user) ? "Estudiante" : user));
+            string email = usernameInput != null ? usernameInput.text.Trim() : "";
+            string password = passwordInput != null ? passwordInput.text : "";
+
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+            {
+                ShowFeedback("Ingresa tu correo y contraseña.");
+                return;
+            }
+
+            StartCoroutine(PerformLoginSequence(email, password));
         }
 
         private void QuickLogin(string provider)
         {
             if (_isLoading) return;
-            ShowFeedback($"Iniciando sesión con {provider}...");
-            StartCoroutine(PerformLoginSequence(provider));
+            ShowFeedback($"El inicio de sesión con {provider} estará disponible próximamente.");
         }
 
-        private IEnumerator PerformLoginSequence(string userName)
+        private IEnumerator PerformLoginSequence(string email, string password)
         {
             _isLoading = true;
 
-            // Animación de pulso del botón
             if (loginButton != null)
-            {
                 StartCoroutine(ButtonPulseRoutine(loginButton.transform));
-            }
 
             yield return new WaitForSeconds(0.15f);
+
+            // --- INICIO: bloque nuevo, llamada real al backend ---
+            bool loginOk = false;
+            string loginError = null;
+
+            AuthService.Instance.Login(email, password,
+                onSuccess: (response) => { loginOk = true; },
+                onError: (error) => { loginError = error; });
+
+            yield return new WaitUntil(() => loginOk || loginError != null);
+
+            if (!loginOk)
+            {
+                _isLoading = false;
+                ShowFeedback(loginError ?? "No se pudo iniciar sesión. Verifica tus datos.");
+                yield break;
+            }
+            // --- FIN: bloque nuevo ---
 
             // Activar y mostrar pantalla de carga
             if (loadingOverlay != null)
@@ -149,7 +171,11 @@ namespace VamosAprendiendo.UI
 
             if (loadingStatusText != null)
             {
-                loadingStatusText.text = $"Preparando aventura para {userName}...";
+                // CORREGIDO: "userName" ya no existe; usamos el email real del usuario autenticado.
+                string displayName = PlayerSession.Instance.CurrentUser != null
+                    ? PlayerSession.Instance.CurrentUser.email
+                    : email;
+                loadingStatusText.text = $"Preparando aventura para {displayName}...";
             }
 
             // Fade in del overlay de carga
@@ -244,6 +270,9 @@ namespace VamosAprendiendo.UI
 
             // Breve pausa para que el usuario aprecie el 100% completado
             yield return new WaitForSeconds(0.35f);
+
+            // CORREGIDO: liberar el bloqueo de _isLoading también en el camino exitoso.
+            _isLoading = false;
 
             // Activar la escena cargada
             if (asyncOp != null)

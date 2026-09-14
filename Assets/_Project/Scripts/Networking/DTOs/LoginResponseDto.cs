@@ -1,16 +1,20 @@
-using UnityEngine;
+using System;
 
-public class LoginResponseDto : MonoBehaviour
+[Serializable]
+public class UserDataDto
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    public string id;
+    public string email;
+    public string role;
+    public string trialEndsAt;
+    public bool isActive;
+}
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+[Serializable]
+public class LoginResponseDto
+{
+    public string accessToken;
+    public string refreshToken;
+    public int expiresIn;
+    public UserDataDto user;
 }
