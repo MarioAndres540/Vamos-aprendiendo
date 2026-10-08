@@ -151,7 +151,9 @@ namespace VamosAprendiendo.UI
                 ShowFeedback(loginError ?? "No se pudo iniciar sesión. Verifica tus datos.");
                 yield break;
             }
-            // --- FIN: bloque nuevo ---
+            
+            if (PresenceService.Instance != null)
+                PresenceService.Instance.StartAppSession();
 
             // Activar y mostrar pantalla de carga
             if (loadingOverlay != null)

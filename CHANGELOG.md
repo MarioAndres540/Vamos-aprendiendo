@@ -8,6 +8,14 @@ El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1
 
 ## [Unreleased] - Por Desarrollar
 
+### Corregido — Presencia en el dashboard del tutor (`Scripts/Networking/PresenceService.cs`, 2026-10-08)
+- **Síntoma**: la app aparecía como **desconectada** en el dashboard web del tutor mientras se jugaba. Cada vez que se pasaba del Editor al navegador, la sesión se cerraba (`end_reason = app_closed` a los pocos segundos).
+- **Causa**: en escritorio y en el Editor, con *Run In Background* desactivado, Unity pausa la app al perder el foco y llama a `OnApplicationPause(true)`, que cerraba la sesión.
+- **Corrección**:
+  - `OnApplicationPause` solo abre o cierra sesiones en móvil (`Application.isMobilePlatform`).
+  - En escritorio y en el Editor se activa `Application.runInBackground = true` para que los latidos sigan con la ventana sin foco.
+  - Guía de referencia actualizada: `vamos-aprendiendo-web/backend/docs/unity-app-sessions.md` (sección 4).
+
 ### En Progreso / Flujo de Texturizado de Modelos 3D (IA VARCO 3D)
 - **Modelos de Entorno Pendientes de Texturizado:**
   - `Low Poly Floating Temple.fbx`

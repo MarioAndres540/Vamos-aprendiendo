@@ -118,11 +118,12 @@ namespace VamosAprendiendo.UI
             dialogImg.raycastTarget = false;
 
             // 4. Hitbox Interactiva sobre 'Reanudar' (Botón Verde)
-            GameObject resumeObj = CreateButtonHitbox("Button_Reanudar", dialogObj.transform, new Vector2(0f, -dialogH * 0.17f), new Vector2(dialogW * 0.44f, dialogH * 0.19f));
+            // Medidas tomadas de menu_pause.png (1536x1024) para que cada hitbox cubra exactamente su botón dibujado.
+            GameObject resumeObj = CreateButtonHitbox("Button_Reanudar", dialogObj.transform, new Vector2(0f, -dialogH * 0.149f), new Vector2(dialogW * 0.377f, dialogH * 0.160f));
             Button resumeBtn = resumeObj.GetComponent<Button>();
 
             // 5. Hitbox Interactiva sobre 'Salir' (Botón Rojo)
-            GameObject exitObj = CreateButtonHitbox("Button_Salir", dialogObj.transform, new Vector2(0f, -dialogH * 0.38f), new Vector2(dialogW * 0.44f, dialogH * 0.19f));
+            GameObject exitObj = CreateButtonHitbox("Button_Salir", dialogObj.transform, new Vector2(0f, -dialogH * 0.313f), new Vector2(dialogW * 0.364f, dialogH * 0.150f));
             Button exitBtn = exitObj.GetComponent<Button>();
 
             // 6. Asignar referencias
@@ -304,6 +305,11 @@ namespace VamosAprendiendo.UI
         {
             Time.timeScale = 1f;
             AudioListener.pause = false;
+
+            // "Salir" vuelve al login: cierra la sesión de app (logout), avisa al backend y borra los tokens.
+            // AuthService persiste entre escenas, así que termina de enviar aunque cambie la escena.
+            if (AuthService.Instance != null) AuthService.Instance.Logout();
+
             SceneManager.LoadScene("LoginScene");
         }
 

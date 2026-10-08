@@ -197,9 +197,23 @@ namespace VamosAprendiendo.Gameplay
             }
         }
 
+        /// <summary>
+        /// Con un joystick táctil la cámara no debe alinearse sola tras el personaje: al girar el personaje
+        /// giraría la cámara y con ella la dirección del joystick, y el personaje daría vueltas.
+        /// </summary>
+        public bool SuppressAutoAlign { get; set; }
+
+        /// <summary>Giro manual de cámara (por ejemplo arrastrando el dedo). x = guiñada, y = cabeceo, en grados.</summary>
+        public void AddOrbitDelta(Vector2 degrees)
+        {
+            _freeLookTimer = 0.5f;
+            _targetYaw += degrees.x;
+            _targetPitch = Mathf.Clamp(_targetPitch - degrees.y, minPitch, maxPitch);
+        }
+
         private void HandleAutoFollowBehind()
         {
-            if (!autoAlignBehindCharacter || target == null) return;
+            if (!autoAlignBehindCharacter || SuppressAutoAlign || target == null) return;
 
             // Si el usuario no está manipulando la cámara con clic derecho
             if (_freeLookTimer <= 0f)

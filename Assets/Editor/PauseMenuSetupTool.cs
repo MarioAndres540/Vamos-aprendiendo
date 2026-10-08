@@ -98,11 +98,11 @@ namespace VamosAprendiendo.EditorTools
             dialogImg.raycastTarget = false;
 
             // 8. Hitbox Interactiva sobre 'Reanudar' (Botón Verde)
-            GameObject resumeObj = CreateButtonHitbox("Button_Reanudar", dialogObj.transform, new Vector2(0f, -dialogH * 0.13f), new Vector2(dialogW * 0.52f, dialogH * 0.15f));
+            GameObject resumeObj = CreateButtonHitbox("Button_Reanudar", dialogObj.transform, new Vector2(0f, -dialogH * 0.0996f), new Vector2(dialogW * 0.378f, dialogH * 0.106f));
             Button resumeBtn = resumeObj.GetComponent<Button>();
 
             // 9. Hitbox Interactiva sobre 'Salir' (Botón Rojo)
-            GameObject exitObj = CreateButtonHitbox("Button_Salir", dialogObj.transform, new Vector2(0f, -dialogH * 0.31f), new Vector2(dialogW * 0.52f, dialogH * 0.15f));
+            GameObject exitObj = CreateButtonHitbox("Button_Salir", dialogObj.transform, new Vector2(0f, -dialogH * 0.209f), new Vector2(dialogW * 0.364f, dialogH * 0.100f));
             Button exitBtn = exitObj.GetComponent<Button>();
 
             // 10. Conectar campos serializados en PauseMenuUI

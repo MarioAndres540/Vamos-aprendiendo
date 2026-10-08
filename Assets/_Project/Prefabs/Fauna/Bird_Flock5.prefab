@@ -1,0 +1,154 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3055151081230883640
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5407126412194547245}
+  - component: {fileID: 4907856559168165161}
+  - component: {fileID: 2702624500808908889}
+  m_Layer: 0
+  m_Name: Bird_Flock5
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5407126412194547245
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3055151081230883640}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 632753016997297475}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4907856559168165161
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3055151081230883640}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e4f9d6c5f964d84f9b852910a129cb3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VamosAprendiendo.Gameplay.CircleFlight
+  center: {x: 0, y: 0, z: 0}
+  radius: 15
+  height: 8
+  degreesPerSecond: 18
+  clockwise: 1
+  startAngle: 0
+  bobAmplitude: 0.8
+  bobSpeed: 0.7
+  radiusWobble: 1.5
+  bankDegrees: 14
+  facingOffsetY: 0
+--- !u!114 &2702624500808908889
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3055151081230883640}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1e46067640a45941b1379f145eac640, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VamosAprendiendo.Gameplay.ProximityActivator
+  model: {fileID: 4284565221897235505}
+  hideDistance: 110
+  hysteresis: 8
+  checkInterval: 0.5
+--- !u!1001 &7102274912688312539
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 5407126412194547245}
+    m_Modifications:
+    - target: {fileID: 6477737816420383978, guid: 32cb7d04aa4a9d9449e65f9f5b2e51eb, type: 3}
+      propertyPath: m_Name
+      value: Model
+      objectReference: {fileID: 0}
+    - target: {fileID: 7662774587659824536, guid: 32cb7d04aa4a9d9449e65f9f5b2e51eb, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 7662774587659824536, guid: 32cb7d04aa4a9d9449e65f9f5b2e51eb, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 7662774587659824536, guid: 32cb7d04aa4a9d9449e65f9f5b2e51eb, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 7662774587659824536, guid: 32cb7d04aa4a9d9449e65f9f5b2e51eb, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7662774587659824536, guid: 32cb7d04aa4a9d9449e65f9f5b2e51eb, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7662774587659824536, guid: 32cb7d04aa4a9d9449e65f9f5b2e51eb, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7662774587659824536, guid: 32cb7d04aa4a9d9449e65f9f5b2e51eb, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7662774587659824536, guid: 32cb7d04aa4a9d9449e65f9f5b2e51eb, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7662774587659824536, guid: 32cb7d04aa4a9d9449e65f9f5b2e51eb, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7662774587659824536, guid: 32cb7d04aa4a9d9449e65f9f5b2e51eb, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7662774587659824536, guid: 32cb7d04aa4a9d9449e65f9f5b2e51eb, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7662774587659824536, guid: 32cb7d04aa4a9d9449e65f9f5b2e51eb, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7662774587659824536, guid: 32cb7d04aa4a9d9449e65f9f5b2e51eb, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 32cb7d04aa4a9d9449e65f9f5b2e51eb, type: 3}
+--- !u!4 &632753016997297475 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7662774587659824536, guid: 32cb7d04aa4a9d9449e65f9f5b2e51eb, type: 3}
+  m_PrefabInstance: {fileID: 7102274912688312539}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &4284565221897235505 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6477737816420383978, guid: 32cb7d04aa4a9d9449e65f9f5b2e51eb, type: 3}
+  m_PrefabInstance: {fileID: 7102274912688312539}
+  m_PrefabAsset: {fileID: 0}

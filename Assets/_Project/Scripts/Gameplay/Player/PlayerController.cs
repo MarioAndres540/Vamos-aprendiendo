@@ -177,6 +177,14 @@ public class PlayerController : MonoBehaviour
         _inputMovement = input;
     }
 
+    /// <summary>Anula la velocidad vertical acumulada (por ejemplo tras reaparecer después de una caída).</summary>
+    public void ResetVerticalVelocity()
+    {
+        _verticalVelocity = 0f;
+        _currentSpeed = 0f;
+        _jumpRequested = false;
+    }
+
     public void RequestJump()
     {
         _jumpRequested = true;

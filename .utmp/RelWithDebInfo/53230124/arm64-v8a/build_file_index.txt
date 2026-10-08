@@ -1,0 +1,2 @@
+E:\SENA\Proyecto productivo\Vamos aprendiendo\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\CMakeLists.txt
+E:\SENA\Proyecto productivo\Vamos aprendiendo\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\GameActivity\CMakeLists.txt
