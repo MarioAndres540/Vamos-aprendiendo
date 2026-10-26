@@ -8,13 +8,14 @@ El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1
 
 ## [Unreleased] - Por Desarrollar
 
-### Corregido — Presencia en el dashboard del tutor (`Scripts/Networking/PresenceService.cs`, 2026-10-08)
-- **Síntoma**: la app aparecía como **desconectada** en el dashboard web del tutor mientras se jugaba. Cada vez que se pasaba del Editor al navegador, la sesión se cerraba (`end_reason = app_closed` a los pocos segundos).
-- **Causa**: en escritorio y en el Editor, con *Run In Background* desactivado, Unity pausa la app al perder el foco y llama a `OnApplicationPause(true)`, que cerraba la sesión.
-- **Corrección**:
-  - `OnApplicationPause` solo abre o cierra sesiones en móvil (`Application.isMobilePlatform`).
-  - En escritorio y en el Editor se activa `Application.runInBackground = true` para que los latidos sigan con la ventana sin foco.
-  - Guía de referencia actualizada: `vamos-aprendiendo-web/backend/docs/unity-app-sessions.md` (sección 4).
+### Pendiente / Conocido
+- **Texturas referenciadas que no vinieron en los paquetes** (no se pueden reparar desde el proyecto; hay que volver a descargar el paquete o elegir otra textura): `Idyllic Fantasy Nature` (rama `Branch` y agua `Lake`), `Polytope Studio` (`PT_Generic_Leaf_mat`, `PT_Rocks_mat`), `TriForge Assets` (tronco y pasto), `IL3DN` (rampas de `IL3DN_FX_Glow`). Prefabs con huecos: `IL3DN_GodRays` y `Polytope Studio/Fence`.
+- **Scripts perdidos en `BaseScene`** (4): cámara principal y cámaras Cinemachine; el paquete Cinemachine no está instalado.
+- **`SineVFX`**: sus 21 materiales usan shaders propios del pipeline antiguo y no se convirtieron.
+- **`Stair_Step_4 (1)`** (en `plataforma_inicial`) no tiene material asignado.
+- **Cuenta de pruebas `test` / `test1`** (`AuthService.cs`): entra sin backend; quitarla o protegerla con `#if UNITY_EDITOR || DEVELOPMENT_BUILD` antes de generar un build para terceros.
+- **Rutas del Editor y del CLI de Unity:** los comandos del CLI cambiaron de nombre (`menu` → `editor invoke_menu`, `editor_play` → `editor.playmode start`, etc.).
+- Sin probar en dispositivo real: controles táctiles, rendimiento del agua, fauna y portales en tablet.
 
 ### En Progreso / Flujo de Texturizado de Modelos 3D (IA VARCO 3D)
 - **Modelos de Entorno Pendientes de Texturizado:**
@@ -29,6 +30,64 @@ El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1
   3. **Configuración de Normal Map:** En Unity, seleccionar la textura normal y cambiar *Texture Type* a `Normal map` -> *Apply*.
   4. **Creación de Material URP:** Crear en `Assets/_Project/Art/Materials/` (ej: `M_Temple.mat`) con shader `Universal Render Pipeline/Lit` (o `Unlit`).
   5. **Asignación:** Asignar *Base Color* a `Base Map`, *Normal Map* a `Normal Map`, ajustar *Smoothness* a `0.0 - 0.1` y aplicar al modelo en escena.
+
+---
+
+## [0.7.0] - 2026-10-26
+
+### Agregado
+- **Ciclo de día y noche** (`SkyboxAnimator.cs`, `SkyboxSetupTool.cs`): 12 minutos de día (amanecer 45 s + día + atardecer 45 s) y 12 minutos de noche, con los cielos `FS003_Sunrise/Day/Sunset/Night` de Fantasy Skybox FREE. Cada momento cambia color y rotación de la luz direccional, luz ambiente y color de la bruma. Menú `Tools > Scenes > Setup Animated Skybox (BaseScene)`.
+- **Personaje `Encapuchado`** reemplaza la cápsula del jugador (contenedor `Visual`, animaciones Idle/Caminar/Saltar/Festejar).
+- **`SpiralLift`**: el jugador se centra en la plataforma al subir y se respeta la posición donde se colocó en la escena.
+
+### Cambiado
+- **UV de `Island_Grass_Rim`, `Grass_Cap_Mini_Island_*` y `Plataforma_uno`:** cada objeto tiene su propia malla con UV en metros reales (3 m por repetición); los bordes y tapas no traían UV y la textura se veía plana o estirada. Menú `Tools > Scenes > Fix Grass Rims, Caps and Platforms UV (3 m)`.
+- **Materiales de bordes, tapas y plataformas:** todos los `Island_Grass_Rim` y `Grass_Cap_Mini_Island_*` usan `M_YFSM_Sand07` (con textura de color) y las `Plataforma_uno*` el nuevo `M_Plataforma_Arena` (base `T_YFSM_03_d`). `M_YFSM_Sand01/02/05` no traen textura de color en el paquete y se veían planos.
+- **Mar de 5 km** (antes 650 m) y bruma con el color del horizonte de cada momento del día, para que no se vea la esquina del agua.
+- **Bruma del mar:** niebla lineal 60–190 m (antes 90–260 m), totalmente opaca antes del borde del mar (≥ 225 m), con el color del horizonte de cada momento del día; ya no se ve el corte del agua.
+
+### Agregado
+- **Preparación para móvil y tablet:**
+  - Plataforma activa **Android** (IL2CPP, ARM64), identificador `com.darkmeridional.vamosaprendiendo`, orientación **solo horizontal**, y las 7 escenas de retos en *Build Settings* (`MobileSetupTool.cs`, menú `Tools > Mobile`).
+  - **Joystick flotante** (`UI/VirtualJoystick.cs`): aparece donde se apoya el pulgar, zona muerta del 20 %, adherencia a los ejes a ±14° y reescalado continuo del valor. `UI/MobileControlsUI.cs` lo conecta con `PlayerController` y bloquea la alineación automática de la cámara mientras se usa. `UI/TouchLookArea.cs` gira la cámara arrastrando en la mitad derecha. Botón **SALTAR** en pantalla.
+  - **Botón de pausa / play** (`UI/PauseButtonUI.cs`, imágenes `btn_pause.png` y `btn_play.png` generadas con `PauseButtonGenerator.cs`): abre y cierra el menú de pausa existente.
+- **Escenas 2D de trazado** (`Scripts/Challenges/Tracing/`, `Editor/TraceSceneBuilder.cs`):
+  - `LetterTrace_2D` (**Vocales** y **Consonantes**, mayúscula y minúscula, incluida la Ñ) y `NumberTrace_2D` (**0 al 9**), 64 formas definidas en `GlyphLibrary.cs`.
+  - **Desbloqueo por progreso** (`TraceCatalog.cs`, `TraceProgress.cs`): no se puede hacer la B sin la A, ni el 3 sin el 2, 1 y 0. Progreso guardado por usuario (`PlayerPrefs`).
+  - **Validación estricta** (`TraceValidator.cs`): el trazo se descarta en cuanto se sale de la forma; cobertura ≥ 85 % y precisión ≥ 97 %.
+  - Menús `Tools > Progress > Reset / Complete All Trace Items` para pruebas.
+- **Portales a los retos** (`Gameplay/Environment/PortalTrigger.cs`, `Gameplay/Player/PlayerSpawnRestorer.cs`): portal **amarillo → letras**, portal **rojo → números**; al volver, el jugador aparece junto al portal.
+- **Caída al vacío** (`Gameplay/Player/FallRespawn.cs`): la pantalla se oscurece durante 3 s con la cámara siguiendo al personaje y este regresa a una posición anterior a la caída.
+- **Escaleras en espiral → una sola plataforma elevadora** (`Gameplay/Environment/SpiralLift.cs`, `Editor/SpiralLiftSetupTool.cs`): sube y baja al jugador por la curva de los escalones, une las plataformas de abajo y de arriba, y vuelve sola a la base. Los demás escalones se ocultan (`Hide Extra Steps` / `Show All Steps`).
+- **Ambientación:**
+  - **Cielo animado** (`SkyboxAnimator.cs`, Fantasy Skybox `FS003_Day`) con giro lento y ciclo de día opcional (apagado).
+  - **Mar** (`Editor/WaterSetupTool.cs`): una sola malla de 650 m bajo las islas con Simple Water Shader (copia de doble cara en `_Project/Art/Shaders/Water`), bruma lineal 90–260 m y niebla bajo el agua (`SeaAtmosphere.cs`).
+  - **Fauna** (`Gameplay/Fauna/`, `Editor/FaunaSetupTool.cs`): 11 grupos de aves en vuelo circular sobre las plataformas inferiores y 16 mariposas revoloteando; se ocultan a distancia (`ProximityActivator.cs`).
+  - **Resplandor cálido en los portales** (`PortalGlow.cs`, `Editor/PortalGlowSetupTool.cs`): halo y luz puntual que pulsan, en la cara exterior de cada `Island_Portal_Core`.
+- **Materiales de arena y texturas en islas** (`Editor/RockBaseMaterialTool.cs`, `PortalCoreMaterialTool.cs`, `TextureDensityTool.cs`, `FixUvStretchTool.cs`): materiales `M_YFSM_Sand*` en `Island_Rock_Base`, `Mini_Island_Right_Front/Back` y `Plataforma_uno (4)`; materiales aleatorios (A_piece_of_nature, Texture_Me, Blink) en los `Island_Portal_Core`. Las mallas sin UV se copian a `_Project/Art/Meshes/Islands/` con UV a 3 m por repetición.
+- **Conexión de sesión de la app con el backend** (`Scripts/Networking/`): `ApiClient` con refresco automático de token y errores con `code`; `AuthService` con `RefreshTokens()` (un solo refresh a la vez) y `Logout()`; `PresenceService` con sesión + latidos cada 15 s (`/presence/sessions`), cierre por segundo plano/salida/cierre de sesión y reapertura con 409/404; `JsonBody.cs` (omite campos vacíos); `Bootstrapper.cs` crea los servicios si se juega desde otra escena y reabre la sesión con el token guardado.
+- **Inicio de sesión de pruebas:** usuario `test` / contraseña `test1` entra sin validar contra el backend (`AuthService.cs`, **temporal**).
+- **Convertidor de materiales de paquetes** (`Editor/PackageMaterialConverter.cs`, menú `Tools > Materials > Convert Package Materials To URP`): pasa a URP Lit/Unlit los materiales Standard, Legacy, Mobile/Unlit, HDRP Lit y shaders propios de Built-in.
+- **Paquetes externos nuevos:** Fantasy Forest Environment Free Sample, Idyllic Fantasy Nature, IL3DN, Mushroom house, Polytope Studio, Selcuk Gerceker, TriForge Assets, Whaleride, YughuesFreeBarkMaterial, YughuesFreeSandMaterials, Zacxophone (aves), Butterfly (Animated), Fantasy Skybox FREE, Simple Water Shader (IgniteCoders), Wooden GUI, Texture_Me, Blink, A_piece_of_nature, Cartoon Animal Pack 01, Kevin Iglesias, SineVFX.
+
+### Cambiado
+- **Reorganización de paquetes externos en `Assets/_ThirdParty/`** (con `AssetDatabase.MoveAsset`, conserva GUID): `Vegetation`, `Buildings`, `Textures`, `Animals`, `Characters`, `Props`, `Environment`, `VFX`, `UI`. En la raíz de `Assets` quedan `_Project`, `Editor`, `Resources`, `Settings`, `TextMesh Pro` y `_Recovery`. Rutas actualizadas en las herramientas del Editor y en `PT_Welcome_Screen.cs` (Polytope) e `IL3DN_Wind_Editor.cs`.
+- **Materiales de paquetes convertidos a URP** (78 + 51 materiales; los de `YughuesFreeBarkMaterial` y los shaders de `Polytope Studio` se sustituyeron con los de sus paquetes URP incluidos).
+- **Pantalla de login:** eliminados los botones de Google y Apple y el separador "o continúa con"; textos más grandes (título 22→28, campos y etiquetas 13→17, botón principal 16→20); tarjeta reducida a 400 de alto.
+- **Cámara** (`SmoothThirdPersonCamera.cs`): nuevas `SuppressAutoAlign` y `AddOrbitDelta()` para el control táctil.
+- **`PlayerController.cs`:** nuevo `ResetVerticalVelocity()`.
+- **Dashboard del tutor:** `PlayerSession` guarda `profileType`, nombre, hijo seleccionado y tokens; `LoginResponseDto` incorpora `profileType`, `profile` y `hasCompletedSetup`.
+
+### Arreglado
+- **Presencia en el dashboard del tutor** (`PresenceService.cs`, 2026-10-08): la app aparecía desconectada porque, al perder el foco del Editor, `OnApplicationPause(true)` cerraba la sesión. Ahora solo cierra en un móvil real (no en el Editor ni en el *Device Simulator*) y `Application.runInBackground = true` mantiene los latidos. Referencia: `vamos-aprendiendo-web/backend/docs/unity-app-sessions.md` (sección 4).
+- **Joystick errático:** medía desde la esquina del círculo y no desde su centro, y la alineación automática de la cámara hacía girar al personaje. Corregido con joystick flotante, zona muerta, adherencia a ejes y cámara fija mientras se usa.
+- **Botón "Salir" del menú de pausa:** las zonas táctiles no coincidían con los botones dibujados en `menu_pause.png` (1536×1024) y se solapaban; recalculadas en `PauseMenuUI.cs` y `PauseMenuSetupTool.cs`. Ahora "Salir" también cierra la sesión (`logout`) antes de volver al login.
+- **Validación del trazo:** aceptaba líneas fuera de la forma; ahora se rechazan.
+- **Agua:** líneas blancas y cuadrícula entre bloques → malla única; el mar no se veía desde abajo al caer → shader de doble cara.
+- **Rayas y estiramiento de texturas** en `Stair_Step_*`, `Dais_Inner`, `Rock_Dais_1`, `Rock_Back_Standing`, `Landmark_Boulder_Stair`, islas, rocas y portales: UV rehechas por plano de cara (`FixUvStretchTool.cs`); estiramiento máximo de 1,3 a 1,0–1,08.
+- **Modelos rosados:** materiales Standard/Legacy/HDRP de los paquetes convertidos a URP; shader `Vegetation` de Idyllic Fantasy Nature con palabras clave de sombras duplicadas.
+- **Errores de consola:** `Readme.asset` de Simple Water Shader (comillas simples con apóstrofes en el YAML) y `AmbiguousMatchException` de `ReadmeEditor.cs` (se desactiva la carga automática de layout; el Readme sigue en el menú `Documentation`). El error `ScriptableSingleton ... DragAndDropCache` es de Unity AI y no del proyecto.
+- **Materiales de `YughuesFreeSandMaterials`** (magenta): sustituidos por las versiones URP de su paquete.
 
 ---
 

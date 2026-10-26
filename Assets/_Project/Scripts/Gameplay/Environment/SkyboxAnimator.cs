@@ -18,6 +18,10 @@ namespace VamosAprendiendo.Gameplay
             public Material skybox;
             public Color sunColor = Color.white;
             public float sunIntensity = 1.2f;
+            [Tooltip("Rotación de la luz direccional (sol o luna) en este momento")]
+            public Vector3 sunEuler = new Vector3(50f, -30f, 0f);
+            [Tooltip("Color de la bruma del horizonte: debe parecerse al color del cielo en el horizonte")]
+            public Color hazeColor = new Color(0.82f, 0.92f, 0.95f);
             [Tooltip("Segundos que dura este momento del día antes de pasar al siguiente")]
             public float holdSeconds = 60f;
         }
@@ -35,6 +39,9 @@ namespace VamosAprendiendo.Gameplay
         [Tooltip("Segundos totales de la transición entre dos momentos (mitad oscureciendo, mitad aclarando)")]
         [SerializeField] private float transitionSeconds = 4f;
 
+        /// <summary>Color de bruma del momento actual (ya atenuado por la transición). a = 0 si no hay ciclo activo.</summary>
+        public static Color CurrentHaze { get; private set; } = new Color(0f, 0f, 0f, 0f);
+
         private static readonly int RotationId = Shader.PropertyToID("_Rotation");
         private static readonly int ExposureId = Shader.PropertyToID("_Exposure");
 
@@ -42,6 +49,7 @@ namespace VamosAprendiendo.Gameplay
         private float _rotation;
         private float _baseExposure = 1f;
         private float _sunIntensity;
+        private SkyPhase _current;
 
         private void Awake()
         {
@@ -113,7 +121,12 @@ namespace VamosAprendiendo.Gameplay
                 if (_runtime.HasProperty(ExposureId)) _baseExposure = _runtime.GetFloat(ExposureId);
                 if (_runtime.HasProperty(RotationId)) _runtime.SetFloat(RotationId, _rotation);
             }
-            if (sun != null) sun.color = phase.sunColor;
+            if (sun != null)
+            {
+                sun.color = phase.sunColor;
+                sun.transform.rotation = Quaternion.Euler(phase.sunEuler);
+            }
+            _current = phase;
             _sunIntensity = phase.sunIntensity;
             DynamicGI.UpdateEnvironment(); // actualiza la luz ambiente con el nuevo cielo
         }
@@ -122,10 +135,14 @@ namespace VamosAprendiendo.Gameplay
         {
             if (_runtime != null && _runtime.HasProperty(ExposureId)) _runtime.SetFloat(ExposureId, _baseExposure * k);
             if (sun != null) sun.intensity = _sunIntensity * k;
+            Color h = phase.hazeColor * Mathf.Max(0.04f, k);
+            h.a = 1f;
+            CurrentHaze = h;
         }
 
         private void OnDestroy()
         {
+            CurrentHaze = new Color(0f, 0f, 0f, 0f);
             if (_runtime != null) Destroy(_runtime);
         }
     }

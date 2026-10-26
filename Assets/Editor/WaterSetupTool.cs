@@ -18,7 +18,7 @@ namespace VamosAprendiendo.EditorTools
     public static class WaterSetupTool
     {
         private const string BASE_SCENE_PATH = "Assets/_Project/Scenes/BaseScene.unity";
-        private const string WATER_DIR = "Assets/IgniteCoders/Simple Water Shader";
+        private const string WATER_DIR = "Assets/_ThirdParty/Environment/IgniteCoders/Simple Water Shader";
         private const string SHADERS_DIR = "Assets/_Project/Art/Shaders/Water";
         private const string MATERIALS_DIR = "Assets/_Project/Art/Materials/Water";
         private const string ROOT_NAME = "Water_Sea";
@@ -26,8 +26,11 @@ namespace VamosAprendiendo.EditorTools
         // Medidas de las islas (m): x -78..32, z -110..20, y desde -3.8. El agua queda por debajo de las puntas.
         private static readonly Vector2 IslandCenterXZ = new Vector2(-23f, -45f);
         private const float WaterY = -10f;
-        private const int GridSize = 13;          // 13x13 bloques de 50 m = 650 m de mar (el borde queda dentro de la bruma)
-        private const float TileOverlap = 1.003f; // los bloques se solapan 0,15 m: sin grietas blancas y casi sin franja visible en las uniones
+        private const float SeaHalfSize = 2500f;  // 5 km de mar en una sola malla: el borde queda casi en la línea del horizonte y dentro de la bruma
+        private const float DenseHalfSize = 90f;  // zona central (islas y vista del jugador) con malla fina
+        private const float DenseStep = 1.25f;    // separación de vértices de la zona fina, similar a la del bloque original (~1,1 m)
+        private const float UvMetersPerTile = 50f; // el bloque original repetía su textura cada 50 m: se conserva el mismo tamaño de ondas
+        private const string MESHES_DIR = "Assets/_Project/Art/Meshes/Water";
 
         [MenuItem("Tools/Scenes/Add Water Below Islands (BaseScene)", false, 24)]
         public static void AddWater()
@@ -36,13 +39,6 @@ namespace VamosAprendiendo.EditorTools
             if (!scene.path.Contains("BaseScene"))
             {
                 scene = EditorSceneManager.OpenScene(BASE_SCENE_PATH, OpenSceneMode.Single);
-            }
-
-            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>($"{WATER_DIR}/Prefabs/WaterBlock_50m.prefab");
-            if (prefab == null)
-            {
-                Debug.LogError("[WaterSetup] Falta el paquete Simple Water Shader (prefab).");
-                return;
             }
 
             var material = CreateSeaMaterial();
@@ -57,37 +53,19 @@ namespace VamosAprendiendo.EditorTools
             root.transform.position = Vector3.zero;
             root.transform.localScale = Vector3.one;
 
-            // Tamaño real del bloque, medido del propio prefab.
-            float block = 50f;
-            var probe = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
-            var probeRenderer = probe.GetComponentInChildren<MeshRenderer>();
-            if (probeRenderer != null) block = Mathf.Max(1f, probeRenderer.bounds.size.x);
-            Object.DestroyImmediate(probe);
-
-            int half = GridSize / 2;
-            for (int gx = -half; gx <= half; gx++)
-            {
-                for (int gz = -half; gz <= half; gz++)
-                {
-                    var tile = (GameObject)PrefabUtility.InstantiatePrefab(prefab, root.transform);
-                    tile.name = $"WaterBlock_{gx}_{gz}";
-                    tile.transform.position = new Vector3(IslandCenterXZ.x + gx * block, WaterY, IslandCenterXZ.y + gz * block);
-                    tile.transform.rotation = Quaternion.identity;
-                    tile.transform.localScale = new Vector3(TileOverlap, 1f, TileOverlap);
-                    tile.isStatic = false;
-
-                    var mr = tile.GetComponentInChildren<MeshRenderer>();
-                    if (mr != null)
-                    {
-                        mr.sharedMaterial = material;
-                        mr.shadowCastingMode = ShadowCastingMode.Off;
-                        mr.receiveShadows = false; // ahorra coste en móvil
-                        mr.lightProbeUsage = LightProbeUsage.Off;
-                        mr.reflectionProbeUsage = ReflectionProbeUsage.Off;
-                    }
-                }
-            }
-
+            // Una sola malla grande en lugar de muchos bloques: sin uniones, grietas ni franjas.
+            var seaMesh = CreateSeaMesh();
+            var plane = new GameObject("Sea_Plane");
+            plane.transform.SetParent(root.transform, false);
+            plane.transform.position = new Vector3(IslandCenterXZ.x, WaterY, IslandCenterXZ.y);
+            plane.isStatic = false;
+            plane.AddComponent<MeshFilter>().sharedMesh = seaMesh;
+            var mr = plane.AddComponent<MeshRenderer>();
+            mr.sharedMaterial = material;
+            mr.shadowCastingMode = ShadowCastingMode.Off;
+            mr.receiveShadows = false; // ahorra coste en móvil
+            mr.lightProbeUsage = LightProbeUsage.Off;
+            mr.reflectionProbeUsage = ReflectionProbeUsage.Off;
             // Bruma lejana y niebla bajo el agua. La niebla lineal queda guardada en la escena (necesario para los builds).
             var atmosphere = new GameObject("SeaAtmosphere");
             atmosphere.transform.SetParent(root.transform, false);
@@ -98,8 +76,8 @@ namespace VamosAprendiendo.EditorTools
             RenderSettings.fog = true;
             RenderSettings.fogMode = FogMode.Linear;
             RenderSettings.fogColor = new Color(0.82f, 0.92f, 0.95f);
-            RenderSettings.fogStartDistance = 90f;
-            RenderSettings.fogEndDistance = 260f;
+            RenderSettings.fogStartDistance = 60f;
+            RenderSettings.fogEndDistance = 190f;
 
             // El shader usa Scene Depth (color por profundidad y espuma): la cámara debe generar la textura de profundidad.
             var cam = Camera.main;
@@ -107,15 +85,94 @@ namespace VamosAprendiendo.EditorTools
             {
                 var data = cam.GetUniversalAdditionalCameraData();
                 data.requiresDepthOption = CameraOverrideOption.On;
-                if (cam.farClipPlane < 900f) cam.farClipPlane = 900f;
+                if (cam.farClipPlane < 3500f) cam.farClipPlane = 3500f;
                 EditorUtility.SetDirty(cam);
             }
 
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
-            Debug.Log($"[WaterSetup] Mar creado: {GridSize}x{GridSize} bloques de {block} m a y={WaterY}, con bruma y doble cara.");
+            Debug.Log($"[WaterSetup] Mar creado: una malla de {SeaHalfSize * 2} m ({seaMesh.vertexCount} vértices) a y={WaterY}, con bruma y doble cara.");
         }
 
+        // Malla plana centrada en el origen: fina en el centro y cada vez más espaciada hacia los bordes.
+        // Las UV siguen las coordenadas del mundo (posición / 50 m), igual que el bloque original, para que las ondas conserven su tamaño.
+        private static Mesh CreateSeaMesh()
+        {
+            Directory.CreateDirectory(MESHES_DIR);
+
+            float[] axis = BuildAxis();
+            int n = axis.Length;
+            var vertices = new Vector3[n * n];
+            var uvs = new Vector2[n * n];
+            var normals = new Vector3[n * n];
+            var tangents = new Vector4[n * n];
+
+            for (int z = 0; z < n; z++)
+            {
+                for (int x = 0; x < n; x++)
+                {
+                    int i = z * n + x;
+                    vertices[i] = new Vector3(axis[x], 0f, axis[z]);
+                    uvs[i] = new Vector2(axis[x] / UvMetersPerTile + 0.5f, axis[z] / UvMetersPerTile + 0.5f);
+                    normals[i] = Vector3.up;
+                    tangents[i] = new Vector4(1f, 0f, 0f, -1f);
+                }
+            }
+
+            var triangles = new int[(n - 1) * (n - 1) * 6];
+            int t = 0;
+            for (int z = 0; z < n - 1; z++)
+            {
+                for (int x = 0; x < n - 1; x++)
+                {
+                    int a = z * n + x, b = a + 1, c = a + n, d = c + 1;
+                    triangles[t++] = a; triangles[t++] = c; triangles[t++] = b;
+                    triangles[t++] = b; triangles[t++] = c; triangles[t++] = d;
+                }
+            }
+
+            var mesh = new Mesh { name = "SeaPlane", indexFormat = IndexFormat.UInt32 };
+            mesh.vertices = vertices;
+            mesh.uv = uvs;
+            mesh.normals = normals;
+            mesh.tangents = tangents;
+            mesh.triangles = triangles;
+            // Margen vertical por si el shader desplaza los vértices (olas): evita que se recorte la malla.
+            mesh.bounds = new Bounds(Vector3.zero, new Vector3(SeaHalfSize * 2f, 20f, SeaHalfSize * 2f));
+
+            string path = $"{MESHES_DIR}/SeaPlane.asset";
+            AssetDatabase.DeleteAsset(path);
+            AssetDatabase.CreateAsset(mesh, path);
+            AssetDatabase.SaveAssets();
+            return AssetDatabase.LoadAssetAtPath<Mesh>(path);
+        }
+
+        private static float[] BuildAxis()
+        {
+            var positive = new System.Collections.Generic.List<float> { 0f };
+            float x = 0f;
+            while (x < DenseHalfSize)
+            {
+                x += DenseStep;
+                positive.Add(x);
+            }
+
+            float step = DenseStep;
+            while (x < SeaHalfSize)
+            {
+                step *= 1.15f;
+                x = Mathf.Min(x + step, SeaHalfSize);
+                positive.Add(x);
+            }
+
+            var axis = new float[positive.Count * 2 - 1];
+            for (int i = 0; i < positive.Count; i++)
+            {
+                axis[positive.Count - 1 + i] = positive[i];
+                axis[positive.Count - 1 - i] = -positive[i];
+            }
+            return axis;
+        }
         // Copia el shader graph del paquete con "Two Sided" activado y un material (copia de Water_mat_03) que lo usa.
         private static Material CreateSeaMaterial()
         {

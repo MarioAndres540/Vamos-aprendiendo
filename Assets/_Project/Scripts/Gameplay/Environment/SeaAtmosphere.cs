@@ -16,8 +16,8 @@ namespace VamosAprendiendo.Gameplay
 
         [Header("Bruma sobre el agua")]
         [SerializeField] private Color hazeColor = new Color(0.82f, 0.92f, 0.95f);
-        [SerializeField] private float hazeStart = 90f;
-        [SerializeField] private float hazeEnd = 260f;
+        [SerializeField] private float hazeStart = 60f;
+        [SerializeField] private float hazeEnd = 190f;
 
         [Header("Bajo el agua")]
         [SerializeField] private Color underwaterColor = new Color(0.08f, 0.42f, 0.5f);
@@ -49,6 +49,9 @@ namespace VamosAprendiendo.Gameplay
             float y = _camera.transform.position.y;
             if (!_underwater && y < waterLevel - hysteresis) EnterWater();
             else if (_underwater && y > waterLevel + hysteresis) ExitWater();
+
+            // El ciclo día/noche tiñe la bruma con el color del horizonte de cada momento.
+            if (!_underwater && SkyboxAnimator.CurrentHaze.a > 0.5f) RenderSettings.fogColor = SkyboxAnimator.CurrentHaze;
         }
 
         private void EnterWater()

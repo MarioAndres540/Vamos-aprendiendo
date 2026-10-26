@@ -18,9 +18,9 @@ namespace VamosAprendiendo.EditorTools
     {
         private const string BASE_SCENE_PATH = "Assets/_Project/Scenes/BaseScene.unity";
 
-        private const string BIRDS_DIR = "Assets/Zacxophone/Birds";
+        private const string BIRDS_DIR = "Assets/_ThirdParty/Animals/Zacxophone/Birds";
         private const string BIRD_URP_PREFABS = BIRDS_DIR + "/URP/Prefabs"; // la carpeta URP: Built-In y HDRP usan otros shaders
-        private const string BUTTERFLY_DIR = "Assets/Butterfly (Animated)";
+        private const string BUTTERFLY_DIR = "Assets/_ThirdParty/Animals/Butterfly (Animated)";
 
         private const string MATERIALS_DIR = "Assets/_Project/Art/Materials/Fauna";
         private const string PREFABS_DIR = "Assets/_Project/Prefabs/Fauna";

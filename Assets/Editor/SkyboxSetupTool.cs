@@ -1,4 +1,4 @@
-#if UNITY_EDITOR
+﻿#if UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -12,7 +12,7 @@ namespace VamosAprendiendo.EditorTools
     public static class SkyboxSetupTool
     {
         private const string BASE_SCENE_PATH = "Assets/_Project/Scenes/BaseScene.unity";
-        private const string SKY_DIR = "Assets/Fantasy Skybox FREE/Panoramics/FS003";
+        private const string SKY_DIR = "Assets/_ThirdParty/Environment/Fantasy Skybox FREE/Panoramics/FS003";
 
         [MenuItem("Tools/Scenes/Setup Animated Skybox (BaseScene)", false, 23)]
         public static void Setup()
@@ -64,21 +64,22 @@ namespace VamosAprendiendo.EditorTools
             so.FindProperty("skybox").objectReferenceValue = day;
             so.FindProperty("sun").objectReferenceValue = sun;
             so.FindProperty("rotationSpeed").floatValue = 1.5f;
-            so.FindProperty("enableDayCycle").boolValue = false;
+            so.FindProperty("enableDayCycle").boolValue = true;
 
             Color dayColor = sun != null ? sun.color : new Color(1f, 0.97f, 0.92f);
             float dayIntensity = sun != null ? sun.intensity : 1.2f;
+            // 12 min de día (amanecer + día + atardecer) y 12 min de noche. Cada cambio de momento usa 4 s de transición.
             var phases = so.FindProperty("phases");
             phases.arraySize = 4;
-            SetPhase(phases.GetArrayElementAtIndex(0), "Día", day, dayColor, dayIntensity, 90f);
-            SetPhase(phases.GetArrayElementAtIndex(1), "Atardecer", sunset, new Color(1f, 0.62f, 0.42f), dayIntensity * 0.75f, 45f);
-            SetPhase(phases.GetArrayElementAtIndex(2), "Noche", night, new Color(0.55f, 0.65f, 1f), dayIntensity * 0.3f, 45f);
-            SetPhase(phases.GetArrayElementAtIndex(3), "Amanecer", sunrise, new Color(1f, 0.82f, 0.62f), dayIntensity * 0.8f, 45f);
+            SetPhase(phases.GetArrayElementAtIndex(0), "Día", day, dayColor, dayIntensity, 626f, new Vector3(50f, -30f, 0f), new Color(0.80f, 0.90f, 0.93f));
+            SetPhase(phases.GetArrayElementAtIndex(1), "Atardecer", sunset, new Color(1f, 0.62f, 0.42f), dayIntensity * 0.75f, 41f, new Vector3(12f, -30f, 0f), new Color(0.78f, 0.30f, 0.10f));
+            SetPhase(phases.GetArrayElementAtIndex(2), "Noche", night, new Color(0.55f, 0.65f, 1f), dayIntensity * 0.3f, 716f, new Vector3(40f, 150f, 0f), new Color(0.10f, 0.58f, 0.64f));
+            SetPhase(phases.GetArrayElementAtIndex(3), "Amanecer", sunrise, new Color(1f, 0.82f, 0.62f), dayIntensity * 0.8f, 41f, new Vector3(10f, 30f, 0f), new Color(0.82f, 0.46f, 0.26f));
             so.ApplyModifiedProperties();
 
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
-            Debug.Log("[SkyboxSetup] Cielo animado configurado en BaseScene (FS003_Day, ciclo de día desactivado).");
+            Debug.Log("[SkyboxSetup] Cielo animado configurado en BaseScene (FS003, ciclo 12 min de día + 12 min de noche).");
         }
 
         private static Material Load(string name)
@@ -86,13 +87,15 @@ namespace VamosAprendiendo.EditorTools
             return AssetDatabase.LoadAssetAtPath<Material>($"{SKY_DIR}/{name}.mat");
         }
 
-        private static void SetPhase(SerializedProperty p, string name, Material sky, Color sunColor, float intensity, float hold)
+        private static void SetPhase(SerializedProperty p, string name, Material sky, Color sunColor, float intensity, float hold, Vector3 sunEuler, Color haze)
         {
             p.FindPropertyRelative("name").stringValue = name;
             p.FindPropertyRelative("skybox").objectReferenceValue = sky;
             p.FindPropertyRelative("sunColor").colorValue = sunColor;
             p.FindPropertyRelative("sunIntensity").floatValue = intensity;
             p.FindPropertyRelative("holdSeconds").floatValue = hold;
+            p.FindPropertyRelative("sunEuler").vector3Value = sunEuler;
+            p.FindPropertyRelative("hazeColor").colorValue = haze;
         }
     }
 }

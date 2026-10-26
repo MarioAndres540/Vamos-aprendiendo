@@ -43,6 +43,14 @@ public class PlayerController : MonoBehaviour
     public bool IsMoving => _inputMovement.sqrMagnitude > 0.01f || (_controller != null && _controller.velocity.sqrMagnitude > 0.1f);
     public Vector2 InputMovement => _inputMovement;
 
+    /// <summary>Velocidad horizontal actual en m/s (para animaciones).</summary>
+    public float CurrentSpeed => _currentSpeed;
+    public float MaxSpeed => moveSpeed;
+    public bool IsGrounded => _controller != null && _controller.isGrounded;
+
+    /// <summary>Se dispara en el instante en que el personaje despega con un salto.</summary>
+    public event System.Action Jumped;
+
     private void Awake()
     {
         _controller = GetComponent<CharacterController>();
@@ -104,6 +112,7 @@ public class PlayerController : MonoBehaviour
             {
                 _verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * gravity);
                 _jumpRequested = false;
+                Jumped?.Invoke();
             }
         }
         else
