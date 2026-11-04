@@ -118,7 +118,7 @@ namespace VamosAprendiendo.UI
             if (xpLabel != null) xpLabel.text = _shownXp + " XP";
         }
 
-        private static string ResolveName()
+        public static string ResolveName()
         {
             var session = PlayerSession.Instance;
             if (session == null) return "Jugador";

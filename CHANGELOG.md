@@ -8,6 +8,11 @@ El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1
 
 ## [Unreleased] - Por Desarrollar
 
+### Agregado — Menú principal con instructivo y créditos (2026-11-03)
+- Nueva escena `MainMenuScene` (`Tools/Scenes/Build Main Menu Scene`, `MainMenuUI`), entre el login y el mundo: **Jugar** (carga el mundo con la pantalla de carga), **Instructivo** (objetivo y controles; "Ver el tutorial" lo vuelve a lanzar), **Créditos** (estudio, autoría y recursos de terceros) y **Cerrar sesión**. Saluda con el nombre de quien juega.
+- `LoginUI.targetSceneName` ahora es `MainMenuScene`; la escena quedó en la compilación justo después de `LoginScene`.
+- Revisar el nombre de los autores en los créditos (`MainMenuSceneBuilder.CreditsText`) antes de entregar.
+
 ### Cambiado — Animaciones de Mixamo en los dos golems (2026-11-03)
 - Se aplican las animaciones de Mixamo de `Art/Animations` (`Mutant Idle`, `Orc Idle`, `Clapping`, `Thoughtful Head Shake`) con `Tools/Animation/Apply Mixamo Animations to Golems` (`MixamoGolemRetarget`). Reemplaza las animaciones por curvas de la versión anterior (`GolemAnimationBuilder` y los clips `Giant01_*` se eliminaron).
 - **Giant01 - Golem** (humanoide): los FBX se importan como Humanoid y sus clips se usan directo. Idle = Mutant Idle (en bucle), `Festejar` = Clapping, `Pensar` = Thoughtful Head Shake.

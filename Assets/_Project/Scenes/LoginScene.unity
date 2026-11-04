@@ -3407,7 +3407,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19da9bb9ccef45d4db9b21829bf7070f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VamosAprendiendo.UI.LoginUI
-  targetSceneName: BaseScene
+  targetSceneName: MainMenuScene
   kidsSceneName: 
   adultsSceneName: 
   minimumLoadingDuration: 2.2
