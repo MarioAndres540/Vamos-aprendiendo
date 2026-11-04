@@ -15,9 +15,9 @@
   th { background: #ece9ff; }
   ul, ol { margin: 3pt 0 8pt 18pt; padding: 0; }
   li { margin: 2pt 0; }
-  .cover { text-align: center; padding-top: 60mm; page-break-after: always; }
-  .cover .sub { font-size: 15pt; color: #6b70a0; margin-bottom: 30pt; }
-  .cover table { width: 70%; margin: 0 auto; }
+  .cover { text-align: center; padding-top: 38mm; page-break-after: always; }
+  .cover .sub { font-size: 15pt; color: #6b70a0; margin-bottom: 26pt; }
+  .cover table { width: 82%; margin: 0 auto; }
   .pending { background: #fff4d6; border: 1px dashed #d9a400; padding: 1pt 5pt; border-radius: 4pt; font-weight: 600; }
   .ok { color: #137a3a; font-weight: 700; } .part { color: #b36b00; font-weight: 700; } .no { color: #b3261e; font-weight: 700; }
   .note { background: #f3f1ff; border-left: 4px solid #6b57dd; padding: 6pt 10pt; margin: 8pt 0; font-size: 10pt; }
@@ -31,11 +31,16 @@
   <h1>Vamos Aprendiendo</h1>
   <div class="sub">Documento de Diseño del Juego (GDD) — Versión final<br>Producto Mínimo Viable (PMV)</div>
   <table>
-    <tr><th>Estudio</th><td>Darkmeridional studio games</td></tr>
-    <tr><th>Contexto</th><td>Proyecto Productivo — SENA</td></tr>
-    <tr><th>Motor</th><td>Unity 6 (6000.3.11f1) · Universal Render Pipeline</td></tr>
-    <tr><th>Autoría</th><td>Mario Andrés <span class="pending">completar nombres completos y demás integrantes</span></td></tr>
+    <tr><th>Aprendiz / Autor principal</th><td>Mario Andrés Jaramillo Arias</td></tr>
+    <tr><th>Estudio</th><td>Darkmeridional Studio Games</td></tr>
+    <tr><th>Programa</th><td>Tecnólogo en Desarrollo de Videojuegos y Entornos Interactivos</td></tr>
+    <tr><th>Centro</th><td>SENA — Centro para la Industria de la Comunicación Gráfica</td></tr>
+    <tr><th>Ficha</th><td>3070352</td></tr>
+    <tr><th>Instructor</th><td>Alvaro Tellez</td></tr>
+    <tr><th>Ciudad</th><td>Medellín — Antioquia</td></tr>
+    <tr><th>Versión del documento</th><td>4.0 (final) — actualiza la versión 3.0 del PMV 3 (10/09/2026)</td></tr>
     <tr><th>Fecha</th><td>Noviembre de 2026</td></tr>
+    <tr><th>Motor y pipeline</th><td>Unity 6000.3.11f1 · Universal Render Pipeline 17.3.0</td></tr>
   </table>
 </div>
 
@@ -43,22 +48,25 @@
 <table>
   <tr><th style="width:38%">Entregable</th><th>Enlace</th></tr>
   <tr><td>Ejecutable / Instalador (Windows .zip · Android .apk)</td><td><span class="pending">pegar el enlace de descarga de la carpeta compartida</span></td></tr>
-  <tr><td>Video demostrativo (máx. 10 min)</td><td><span class="pending">pegar el enlace de visualización</span></td></tr>
-  <tr><td>Repositorio del código fuente</td><td>https://github.com/MarioAndres540/Vamos-aprendiendo (ramas <code>main</code> y <code>develop</code>)</td></tr>
+  <tr><td>Video demostrativo final (máx. 10 min)</td><td><span class="pending">pegar el enlace de visualización</span> · Video del PMV 3: https://youtu.be/eUnEk5y6g80</td></tr>
+  <tr><td>Repositorio — juego (Unity)</td><td>https://github.com/MarioAndres540/Vamos-aprendiendo/tree/develop</td></tr>
+  <tr><td>Repositorio — backend (NestJS + Supabase)</td><td>https://github.com/MarioAndres540/backend_vamos-aprendiendo/tree/develop</td></tr>
+  <tr><td>Repositorio — frontend (Nuxt)</td><td>https://github.com/MarioAndres540/frontend-vamos-aprendiendo/tree/develop</td></tr>
 </table>
 
 <h2>Contenido</h2>
 <ol class="toc">
-  <li>Resumen y concepto del juego</li>
+  <li>Ficha técnica y resumen ejecutivo</li>
   <li>Público objetivo y objetivos pedagógicos</li>
   <li>Flujo general y navegación</li>
   <li>Mecánica principal: el trazo guiado</li>
   <li>Progreso, experiencia (XP) y cofre</li>
   <li>HUD e indicadores</li>
   <li>Condiciones de inicio, victoria y reintento</li>
-  <li>Interfaz, arte y audio</li>
+  <li>Interfaz, arte, iluminación y audio</li>
   <li>Arquitectura técnica</li>
-  <li>Alcance, estado y trabajo futuro</li>
+  <li>Estado del alcance y cambios desde el PMV 3</li>
+  <li>Registro de versiones e incidencias</li>
   <li>Pruebas y estabilidad</li>
   <li>Anexo A — Documentación técnica: plataformas y requisitos mínimos</li>
   <li>Anexo B — Manual de usuario</li>
@@ -67,41 +75,59 @@
   <li>Créditos y licencias</li>
 </ol>
 
-<h2>1. Resumen y concepto del juego</h2>
+<h2>1. Ficha técnica y resumen ejecutivo</h2>
+<table>
+  <tr><th style="width:30%">Campo</th><th>Especificación</th></tr>
+  <tr><td>Título</td><td>Vamos Aprendiendo</td></tr>
+  <tr><td>Género</td><td>Videojuego educativo 3D / estimulación neurocognitiva multigeneracional</td></tr>
+  <tr><td>Plataformas</td><td>PC Standalone Windows (x86_64) como plataforma principal; Android (APK) como plataforma secundaria. WebGL queda como objetivo futuro.</td></tr>
+  <tr><td>Entrada</td><td>New Input System: teclado, ratón y Gamepad XInput en PC; táctil (joystick virtual y botones en pantalla) en Android.</td></tr>
+  <tr><td>Lenguaje y motor</td><td>C# · Unity 6000.3.11f1 · URP 17.3.0 · TextMesh Pro</td></tr>
+  <tr><td>Servicios</td><td>Backend NestJS + Supabase (PostgreSQL) y sitio web Nuxt con dashboard de seguimiento</td></tr>
+</table>
 <p><b>Vamos Aprendiendo</b> es una plataforma lúdico-educativa para grandes y chicos que quieren mejorar sus capacidades. El jugador explora un archipiélago de islas flotantes en 3D, se acerca al pulpo guía y elige una actividad. En la actividad aprende y practica el trazo de <b>letras</b> y <b>números</b> siguiendo un camino guiado; al terminar, abre un <b>cofre</b> que le entrega su experiencia (XP).</p>
-<p>Los más pequeños aprenden desde los números y las letras hasta distinguir objetos, formar frases completas y resolver operaciones matemáticas; para los más grandes se plantea una serie de retos que ejercitan la actividad cognitiva para mantener el cerebro activo cada día. En esta versión (PMV) está completa la ruta de <b>escritura y números</b>; el resto se describe en el apartado de trabajo futuro.</p>
-<p>La app se acompaña de un <b>sitio web</b> (registro de tutores y estudiantes y dashboard de progreso) y de un <b>backend</b> que guarda los intentos, la experiencia y el tiempo de juego.</p>
+<p>Los más pequeños aprenden desde los números y las letras hasta distinguir objetos, formar frases completas y resolver operaciones matemáticas; para los más grandes se plantea una serie de retos que ejercitan la actividad cognitiva para mantener el cerebro activo cada día. En esta versión (PMV final) está completa la ruta de <b>números y letras</b>; el resto se describe como trabajo futuro (apartado 10).</p>
+<p><b>Alcance entregado en el PMV final:</b></p>
+<ul>
+  <li>Aplicación para Windows y Android con registro web, inicio de sesión, menú principal (Jugar, Instructivo, Créditos), tutorial guiado y botón de ayuda.</li>
+  <li>Mundo 3D de islas flotantes con control en tercera persona, portales, signos de misión («!» y «?») y cofre de experiencia.</li>
+  <li>Actividad de trazo con validación (cobertura y exactitud), 64 ejercicios (números 0-9, vocales y 22 consonantes en mayúscula y minúscula).</li>
+  <li>HUD con nombre del jugador, experiencia y tiempo; telemetría real hacia el backend; dashboard web de progreso.</li>
+</ul>
 
 <h2>2. Público objetivo y objetivos pedagógicos</h2>
 <table>
-  <tr><th>Grupo</th><th>Propósito</th></tr>
-  <tr><td>Infantil</td><td>Iniciación en lectoescritura y grafomotricidad: reconocimiento y trazo de vocales, consonantes y números del 0 al 9.</td></tr>
-  <tr><td>Adulto / Adulto mayor</td><td>Estimulación cognitiva y agilidad mental (planteado como ruta de retos; ver trabajo futuro).</td></tr>
+  <tr><th>Perfil</th><th>Propósito</th></tr>
+  <tr><td>Infantil</td><td>Iniciación en lectoescritura, grafomotricidad, reconocimiento de trazos y conteo básico (implementado: trazo de números y letras).</td></tr>
+  <tr><td>Adulto</td><td>Operaciones aritméticas, agilidad mental y comprensión léxica (trabajo futuro).</td></tr>
+  <tr><td>Adulto mayor</td><td>Estimulación neurocognitiva, memoria espacial, laberintos y retención visual (trabajo futuro).</td></tr>
   <tr><td>Tutor / profesor</td><td>Seguimiento del avance: experiencia, tiempo de juego, precisión del trazo, progreso por ruta y rendimiento por área.</td></tr>
 </table>
 <p>Objetivos pedagógicos: (1) aprender el <b>orden y la dirección</b> correctos del trazo (cada trazo numerado, con flechas); (2) fortalecer la coordinación visomotora; (3) reforzar con <b>recompensa</b> inmediata (estrellas, experiencia, cofre); (4) dar al adulto responsable <b>datos reales</b> del progreso.</p>
 
 <h2>3. Flujo general y navegación</h2>
+<p>Escenas incluidas en la compilación: <code>LoginScene</code> → <code>MainMenuScene</code> → <code>BaseScene</code> (mundo) → <code>ActivitySelect</code> («Tu ruta») → <code>LetterTrace_2D</code> / <code>NumberTrace_2D</code> (actividades de trazo).</p>
 <ol>
   <li><b>Registro (web).</b> Quien se registra lo hace en la página web: llena el formulario de ingreso y, si es tutor, los datos de su hijo. Solo después puede ingresar a la app. En el login, el botón «Regístrate» abre esa página en el navegador del dispositivo.</li>
   <li><b>Inicio de sesión.</b> Usuario y contraseña; si la cuenta es de un tutor con varios hijos, elige quién juega.</li>
   <li><b>Menú principal.</b> Saludo con el nombre del jugador y los botones <i>Jugar</i>, <i>Instructivo</i> (objetivo y controles, con «Ver el tutorial»), <i>Créditos</i> y <i>Cerrar sesión</i>.</li>
   <li><b>Tutorial.</b> La primera vez que entra al mundo (y cuando toca el botón «?»): tarjeta de bienvenida y una viñeta por control (joystick, cámara, salto, sonido, pausa). El juego queda detenido y no avanza hasta que el jugador usa ese control.</li>
-  <li><b>Mundo (islas flotantes).</b> Exploración en tercera persona. El pulpo abre la pantalla «Tu ruta» con las tarjetas Números, Letras minúsculas, Letras mayúsculas y Consonantes; al elegir una, el personaje camina hasta el portal de esa actividad.</li>
+  <li><b>Mundo (islas flotantes).</b> Exploración en tercera persona. El pulpo abre «Tu ruta» con las tarjetas Números, Letras minúsculas, Letras mayúsculas y Consonantes; al elegir una, el personaje camina hasta el portal de esa actividad.</li>
   <li><b>Actividad de trazo.</b> Pantalla de trazo guiado (apartado 4). Al salir se guarda el progreso en el servidor.</li>
   <li><b>Cofre.</b> De vuelta en el mundo, el signo «?» sobre el cofre indica que hay experiencia por cobrar; al tocarlo se abre y entrega la experiencia.</li>
 </ol>
-<p>Atajos permanentes: botón de <b>pausa</b> (continuar o salir), botón de <b>sonido</b> y botón de <b>ayuda «?»</b> que repite el tutorial.</p>
+<p>Atajos permanentes: botón de <b>pausa</b> (continuar o salir; en PC también la tecla Esc), botón de <b>sonido</b> y botón de <b>ayuda «?»</b> que repite el tutorial.</p>
 
 <h2>4. Mecánica principal: el trazo guiado</h2>
-<p>La pantalla de trazo sigue tres pasos que se resaltan en la barra superior: <b>MIRA › TRAZA › PRACTICA</b>.</p>
+<p>El trazo se registra como coordenadas continuas del dedo (o del cursor) y se compara con el camino de la forma, validando orientación, continuidad y precisión. La pantalla sigue tres pasos que se resaltan en la barra superior: <b>MIRA › TRAZA › PRACTICA</b>.</p>
 <ol>
   <li><b>MIRA.</b> Una bolita recorre cada trazo en orden mientras el panel «Instrucciones» lo explica (por ejemplo «Baja», «Ve a la derecha»). «Repetir modelo» lo vuelve a mostrar.</li>
-  <li><b>TRAZA.</b> Con «Comenzar a trazar» se habilita el dibujo con el dedo. Cada trazo tiene su número y flechas de dirección; «Paso x de n» indica el avance. Si el dedo se sale del camino el trazo se descarta y se avisa para repetirlo.</li>
-  <li><b>PRACTICA.</b> «Comprobar» evalúa el trazo: cobertura del camino y exactitud. Si aprueba, queda completo; si no, aparece «¡Ups! Intenta de nuevo» y puede reintentar.</li>
+  <li><b>TRAZA.</b> Con «Comenzar a trazar» se habilita el dibujo. Cada trazo tiene su número y flechas de dirección; «Paso x de n» indica el avance. Si el dedo se sale del camino, el trazo se descarta y se avisa para repetirlo.</li>
+  <li><b>PRACTICA.</b> «Comprobar» evalúa el trazo (cobertura del camino y exactitud). Si aprueba, queda completo; si no, aparece «¡Ups! Intenta de nuevo» y puede reintentar.</li>
 </ol>
 <p><b>Sonido de apoyo:</b> Silencio, Música suave o Voz guía, con volumen ajustable; «Escuchar» lee la letra o el número cuando existe su audio.</p>
-<p>Cada intento (aprobado o no) se envía al backend con su cobertura y exactitud; el servidor decide si aprueba el ejercicio y lo registra una sola vez por estudiante.</p>
+<p>Cada intento (aprobado o no) se envía al backend con su cobertura y exactitud; el servidor decide si aprobó el ejercicio y lo registra una sola vez por estudiante. Si no hay conexión, los intentos se guardan en una cola local y se envían después.</p>
+<p><b>Exploración del mundo:</b> el jugador se mueve con un <code>CharacterController</code> (movimiento unificado por frame y adherencia al suelo), con salto y cámara en tercera persona suavizada (<code>SmoothThirdPersonCamera</code>) que se orienta con el joystick o el ratón.</p>
 
 <h2>5. Progreso, experiencia (XP) y cofre</h2>
 <ul>
@@ -132,55 +158,83 @@
   <tr><td>Pausa</td><td>El menú de pausa detiene el juego; permite continuar, ajustar el audio o salir.</td></tr>
 </table>
 
-<h2>8. Interfaz, arte y audio</h2>
+<h2>8. Interfaz, arte, iluminación y audio</h2>
 <ul>
-  <li><b>Estilo:</b> islas flotantes estilizadas (low poly / toon), paleta violeta y verde, interfaz redondeada y legible para niños.</li>
-  <li><b>Arte 3D:</b> personaje, pulpo, signos «!» y «?», cofre, portales, vegetación y animales; dos golems animados con animaciones de Mixamo (Giant01 con rig humanoide; Crowned Stone Golem con esqueleto propio, animación horneada).</li>
-  <li><b>Texturas:</b> el tamaño máximo de importación se limita a <b>1024 × 1024</b> en modelos y entorno (se exceptúan sprites de interfaz y cielos).</li>
-  <li><b>Interfaz 2D:</b> menú principal, pantalla de trazo, «Tu ruta», tarjeta de recompensa, HUD, pausa y tutorial.</li>
-  <li><b>Audio:</b> música ambiente del mundo (día y noche con fundido), música suave y voz guía opcionales en la actividad, efectos, y ajustes de volumen persistentes.</li>
+  <li><b>Estilo:</b> tercera persona 3D estilizado low-poly (islas flotantes); paleta violeta y verde; interfaz redondeada y legible para niños.</li>
+  <li><b>Arte 3D:</b> entorno del archipiélago, templo flotante, árbol de otoño, portal rúnico, estatua de águila, golems de piedra, signos «!» y «?», cofre, vegetación y animales. Texturizado PBR de modelos con flujo asistido por IA (VARCO 3D). Dos golems animados con animaciones de Mixamo (Giant01 con rig humanoide; Crowned Stone Golem con esqueleto propio y animación horneada).</li>
+  <li><b>Materiales y texturas:</b> shaders URP/Lit con mapas PBR; tamaño máximo de importación de <b>1024 × 1024</b> en modelos y entorno (se exceptúan sprites de interfaz y cielos).</li>
+  <li><b>VFX:</b> Hovl Studio (Magic Effects) y prefabs de portales de Reversed Interactive.</li>
+  <li><b>Iluminación:</b> luz direccional con ciclo de día y noche, sombras suaves en tiempo real y faroles con emisión dinámica (<code>LanternGlow</code>, Point Lights).</li>
+  <li><b>Interfaz 2D:</b> menú principal, pantalla de trazo, «Tu ruta», tarjeta de recompensa, HUD, pausa y tutorial, todos con escalado a 1920 × 1080.</li>
+  <li><b>Audio:</b> 25 pistas instrumentales de ambientación (estilo RPG) con cambio día/noche, música suave y voz guía opcionales en la actividad, banco de efectos Casual Game Sounds U6 y ajustes de volumen persistentes.</li>
 </ul>
 
 <h2>9. Arquitectura técnica</h2>
 <table>
   <tr><th>Parte</th><th>Tecnología</th><th>Responsabilidad</th></tr>
   <tr><td>Juego</td><td>Unity 6 (6000.3.11f1), C#, URP, New Input System, TextMesh Pro</td><td>Mundo 3D, menú, actividades, HUD, tutorial, sincronización de progreso.</td></tr>
-  <tr><td>Backend</td><td>NestJS (API REST) sobre Supabase (PostgreSQL)</td><td>Autenticación, intentos, ejercicios aprobados, experiencia y cobro en el cofre, tiempo de juego, progreso por ruta, módulo del profesor.</td></tr>
-  <tr><td>Web</td><td>Nuxt 4 · Vue · PrimeVue</td><td>Registro de tutores y estudiantes y dashboard de progreso.</td></tr>
+  <tr><td>Backend</td><td>NestJS (API REST) sobre Supabase (PostgreSQL y autenticación)</td><td>Autenticación y control de acceso, intentos, ejercicios aprobados, experiencia y cobro en el cofre, tiempo de juego, progreso por ruta, módulo del profesor.</td></tr>
+  <tr><td>Web</td><td>Nuxt · Vue · PrimeVue</td><td>Registro de tutores y estudiantes y dashboard de progreso.</td></tr>
 </table>
-<p>Organización del código de Unity: <code>Core</code> (arranque y flujo), <code>Gameplay</code> (jugador, cámara, entorno, interacción), <code>Challenges</code> (trazo y progreso), <code>UI</code> (menús, HUD, tutorial), <code>Networking</code> (API, autenticación, sincronización) y <code>Profiles</code> (sesión). Los intentos se guardan en una cola local y se envían cuando hay conexión.</p>
+<p>El cliente de Unity se organiza en capas desacopladas, arrancadas por un <code>Bootstrapper</code> persistente (<code>DontDestroyOnLoad</code>) que garantiza los servicios de red en cualquier escena: <code>Core</code> (arranque y audio), <code>Gameplay</code> (jugador, cámara, entorno, interacción), <code>Challenges</code> (trazo y progreso), <code>UI</code> (menús, HUD, tutorial), <code>Networking</code> (API, autenticación, sincronización, experiencia) y <code>Profiles</code> (sesión del jugador).</p>
+<p>Patrones aplicados: <b>capa de servicios</b> (<code>ApiClient</code>, <code>AuthService</code>, <code>ProgressSyncService</code>, <code>XpService</code>), <b>DTOs</b> tipados para la serialización JSON, <b>observador / eventos</b> (<code>TraceProgress.Changed</code>, <code>MissionRewards.Changed</code>) y entrada por acciones del New Input System (la API legacy <code>UnityEngine.Input</code> está prohibida en el estándar de código). Convenciones: PascalCase en clases y métodos, <code>Awake()</code> para referencias internas y <code>Start()</code> para conectar con otros sistemas.</p>
 
-<h2>10. Alcance, estado y trabajo futuro</h2>
+<h2>10. Estado del alcance y cambios desde el PMV 3</h2>
 <table>
-  <tr><th>Elemento</th><th>Estado en esta versión</th></tr>
-  <tr><td>Trazo de números y letras (vocales y consonantes) con validación</td><td class="ok">Completo</td></tr>
-  <tr><td>Registro web, inicio de sesión, menú, tutorial, créditos</td><td class="ok">Completo (la URL pública del registro se configura al publicar el sitio)</td></tr>
-  <tr><td>Experiencia con cofre, HUD y dashboard web</td><td class="ok">Completo</td></tr>
-  <tr><td>Voz guía de cada letra y número</td><td class="part">Preparada: se activa al agregar los audios</td></tr>
-  <tr><td>Operaciones matemáticas, secuencias, palabras y frases</td><td class="no">Trabajo futuro</td></tr>
-  <tr><td>Retos para adultos (laberinto, memoria)</td><td class="no">Trabajo futuro</td></tr>
+  <tr><th>Elemento</th><th>PMV 3 (10/09/2026)</th><th>Versión final</th></tr>
+  <tr><td>Telemetría y backend</td><td>Proyectados; módulo de telemetría vacío</td><td class="ok">Operativos: intentos, experiencia con cobro en el cofre, tiempo de juego, progreso por ruta</td></tr>
+  <tr><td>Dashboard web</td><td>Vistas de autenticación; sin datos reales</td><td class="ok">Datos reales de la app</td></tr>
+  <tr><td>Registro</td><td>No definido</td><td class="ok">Registro en la web; la app abre esa página</td></tr>
+  <tr><td>Menú y ayuda</td><td>Login y pausa</td><td class="ok">Menú principal, instructivo, créditos, tutorial y botón de ayuda</td></tr>
+  <tr><td>Actividades</td><td>Escenas de retos creadas (esqueletos)</td><td class="ok">Trazo de números y letras completo (64 ejercicios)</td></tr>
+  <tr><td>Plataformas</td><td>Windows; Android y WebGL proyectadas</td><td class="ok">Windows y Android (APK)</td></tr>
+  <tr><td>Operaciones matemáticas, secuencias, palabras y frases</td><td>Planeadas</td><td class="no">Trabajo futuro</td></tr>
+  <tr><td>Retos de memoria y laberinto (adulto y adulto mayor)</td><td>Planeados</td><td class="no">Trabajo futuro</td></tr>
+  <tr><td>Reto «contrarreloj»</td><td>Planeado para aritmética</td><td class="no">Trabajo futuro (hoy el tiempo se muestra en el HUD pero no limita el juego)</td></tr>
+  <tr><td>Voz guía de cada letra y número</td><td>—</td><td class="part">Preparada: se activa al agregar los audios</td></tr>
 </table>
-<div class="note">Las escenas de retos futuros existen en el repositorio como esqueletos, pero se excluyeron de la compilación del PMV para no mostrar contenido vacío.</div>
+<div class="note">Las escenas de retos futuros (<code>MathOperation</code>, <code>Maze</code>, <code>Memory</code>, <code>PlatformJump</code>) existen en el repositorio como esqueletos, pero se excluyeron de la compilación del PMV final para no mostrar contenido vacío. Los patrones «máquina de estados» (<code>GameFlowManager</code>) y «método plantilla» (<code>ChallengeBase</code>) de la versión anterior quedan como base para esos retos futuros: en esta versión el flujo entre escenas lo resuelven el menú, el cargador de escenas y las propias pantallas.</div>
 
-<h2>11. Pruebas y estabilidad</h2>
+<h2>11. Registro de versiones e incidencias</h2>
+<h3>11.1 Versiones</h3>
+<table>
+  <tr><th>Versión</th><th>Fecha</th><th>Cambios principales</th></tr>
+  <tr><td>0.1.0</td><td>2026-09-05</td><td>Estructura base, New Input System, primer jugador y cámara.</td></tr>
+  <tr><td>0.2.0</td><td>2026-09-07</td><td>Corrección de la física del jugador, movimiento relativo a la cámara, ajuste del centro del CharacterController.</td></tr>
+  <tr><td>0.3.0</td><td>2026-09-08</td><td>Pantalla de carga, salto, cámara avanzada, carrusel de personajes, escenas de desafíos.</td></tr>
+  <tr><td>0.4.0</td><td>2026-09-09</td><td>Menú de pausa con Esc, material PBR del golem, faroles con emisión, migración completa al New Input System.</td></tr>
+  <tr><td>0.5.0 (final)</td><td>2026-10 / 2026-11</td><td>Inicio de sesión y conexión al backend; telemetría y experiencia; trazo guiado con validación; cofre y señales de misión; menú principal, tutorial y ayuda; HUD con experiencia y tiempo; animaciones de golems; ciclo de día y noche; texturas a 1024; compilación para Windows y Android.</td></tr>
+</table>
+<h3>11.2 Incidencias de la bitácora técnica y su estado</h3>
+<table>
+  <tr><th>Incidencia</th><th>Estado final</th></tr>
+  <tr><td>Bug 3 — Componentes de Cinemachine en la escena sin el paquete declarado en el manifiesto</td><td class="ok">Resuelto: se retiraron los componentes huérfanos de <code>BaseScene</code> (la cámara usa <code>SmoothThirdPersonCamera</code>); ninguna escena tiene scripts faltantes.</td></tr>
+  <tr><td>Bug 4 — Carpeta <code>_Recovery</code> (autoguardados) versionada</td><td class="ok">Resuelto: se agregó al <code>.gitignore</code> y se retiró del control de versiones.</td></tr>
+  <tr><td>Bug 5 — Periodo de prueba: 14 días en el backend frente a «semana gratis» en la documentación</td><td class="part">Pendiente de confirmar la regla vigente y unificar el texto.</td></tr>
+  <tr><td>Bug 6 — Módulo de telemetría sin implementar</td><td class="ok">Resuelto: intentos, experiencia, tiempo y progreso ya viajan al backend y se ven en el dashboard.</td></tr>
+  <tr><td>Revisión de colliders (MeshCollider) para Android</td><td class="part">Pendiente de medir rendimiento en dispositivo.</td></tr>
+</table>
+
+<h2>12. Pruebas y estabilidad</h2>
 <ul>
   <li><b>Backend:</b> 233 pruebas automatizadas en verde (autenticación, intentos, experiencia y cobro, progreso, módulo del profesor).</li>
-  <li><b>Juego:</b> pruebas manuales en el Editor de cada flujo (login, menú, tutorial, trazo, cofre, pausa, sincronización).</li>
+  <li><b>Juego:</b> pruebas manuales en el Editor de cada flujo (login, menú, tutorial, trazo, cofre, pausa, sincronización); todas las escenas de la compilación sin scripts faltantes.</li>
   <li><b>Pendiente:</b> medir la estabilidad en dispositivos reales (sesiones largas, sin cierres inesperados) antes de la sustentación. <span class="pending">completar con el resultado de las pruebas en dispositivo</span></li>
 </ul>
 
 <h2>Anexo A — Documentación técnica: plataformas y requisitos mínimos</h2>
 <table>
-  <tr><th>Plataforma</th><th>Entrega</th><th>Requisitos mínimos</th></tr>
-  <tr><td>Windows</td><td>Carpeta compilada en .zip (ejecutable <code>.exe</code>, datos y librerías)</td><td>Windows 10 de 64 bits, tarjeta gráfica compatible con DirectX 11, conexión a internet para iniciar sesión.</td></tr>
-  <tr><td>Android</td><td>Archivo <code>.apk</code></td><td>Android 7.1 (API 25) o superior, conexión a internet para iniciar sesión.</td></tr>
+  <tr><th>Perfil</th><th>Especificación mínima</th></tr>
+  <tr><td>Usuario final — Windows (.exe)</td><td>Windows 10 de 64 bits · procesador de doble núcleo a 2.0 GHz o superior · 4 GB de RAM · Intel UHD 620 o equivalente (DirectX 11) · 1.5 GB de espacio · teclado y ratón (Gamepad XInput opcional) · conexión a internet para iniciar sesión.</td></tr>
+  <tr><td>Usuario final — Android (.apk)</td><td>Android 7.1 (API 25) o superior · pantalla táctil · conexión a internet para iniciar sesión. <span class="pending">completar RAM y almacenamiento con la prueba en dispositivo</span></td></tr>
+  <tr><td>Desarrollo (Editor)</td><td>Windows 10/11 de 64 bits · Intel i5 de 8.ª gen. / Ryzen 5 o superior · 8 GB de RAM (16 GB recomendado) · GTX 1050 / RX 560 o superior · 20 GB en SSD · Unity Hub + Editor 6000.3.11f1 + Visual Studio o Rider.</td></tr>
 </table>
-<div class="note">El sistema mínimo de Android sale de la configuración del proyecto (API 25). La memoria y el procesador recomendados no se midieron de forma formal: <span class="pending">completar con las pruebas en dispositivo (RAM, procesador, almacenamiento)</span>. Se requiere el servidor (backend) publicado y accesible por internet.</div>
+<div class="note">Se requiere el servidor (backend) publicado y accesible por internet. Los intentos hechos sin conexión se guardan en el dispositivo y se envían al recuperar la conexión.</div>
 
 <h2>Anexo B — Manual de usuario</h2>
 <h3>B.1 Instalación</h3>
 <ul>
-  <li><b>Windows:</b> descomprima el .zip en una carpeta y ejecute <code>VamosAprendiendo.exe</code>.</li>
+  <li><b>Windows:</b> descomprima el .zip en una carpeta y ejecute <code>Vamos_aprendiendo.exe</code> (junto a su carpeta de datos y librerías).</li>
   <li><b>Android:</b> copie el .apk al dispositivo, permita «instalar de orígenes desconocidos» si el sistema lo pide, abra el archivo e instale.</li>
 </ul>
 <h3>B.2 Registro e inicio de sesión</h3>
@@ -201,7 +255,7 @@
   <tr><td>Pausa</td><td>Bajo el botón de sonido</td><td>Detiene el juego; permite continuar o salir.</td></tr>
   <tr><td>Ayuda «?»</td><td>Bajo el botón de pausa</td><td>Repite el tutorial.</td></tr>
 </table>
-<p>En computador se puede usar también el teclado y el ratón; la tecla <b>Esc</b> abre la pausa.</p>
+<p>En computador se puede jugar también con teclado y ratón o con Gamepad; la tecla <b>Esc</b> abre la pausa.</p>
 <h3>B.5 Cómo jugar</h3>
 <ol>
   <li>Camine hasta el pulpo y tóquelo para abrir <b>Tu ruta</b>; elija una tarjeta.</li>
@@ -220,28 +274,29 @@
 </ul>
 
 <h2>Anexo C — Documentación del uso de inteligencia artificial</h2>
-<p>En el desarrollo se usó <b>Claude Code</b> (Anthropic) como asistente de programación, bajo la dirección y revisión del equipo. Todo el código y los cambios se revisaron, se probaron y se versionaron en el repositorio; las decisiones de diseño y los contenidos pedagógicos las definió el equipo.</p>
+<p>El proyecto usó herramientas de IA como apoyo, bajo la dirección y revisión del equipo: todo el código y los cambios se revisaron, se probaron y se versionaron en los repositorios; las decisiones de diseño y los contenidos pedagógicos los definió el equipo.</p>
 <table>
-  <tr><th>Uso</th><th>Qué se hizo con apoyo de IA</th></tr>
-  <tr><td>Código del juego (Unity/C#)</td><td>Menú principal, tutorial, HUD, cofre y experiencia, nuevo diseño de la pantalla de trazo, sincronización de progreso, animaciones de los golems.</td></tr>
-  <tr><td>Herramientas de editor</td><td>Constructores de escenas y de interfaz reproducibles (menús <i>Tools</i> del Editor).</td></tr>
-  <tr><td>Backend y web</td><td>Endpoints de experiencia, progreso y tiempo; migraciones de base de datos; pruebas automatizadas; ajustes del dashboard.</td></tr>
-  <tr><td>Documentación</td><td>Registros de cambios (CHANGELOG) y este documento.</td></tr>
+  <tr><th>Herramienta</th><th>Uso</th></tr>
+  <tr><td>Gemini Pro</td><td>Asistencia de código y orquestación en los tres repositorios y definición de prompts para Blender (fases iniciales).</td></tr>
+  <tr><td>MCP de Blender ↔ Antigravity</td><td>Modelado 3D low-poly asistido por agente para la geometría del entorno, con un ciclo de refinamiento documentado (un cambio por prompt, anclaje numérico, respaldo previo y verificación).</td></tr>
+  <tr><td>UnityMcpBridge</td><td>Automatización de tareas del editor de Unity (escenas, cámara, escalado del entorno, faroles).</td></tr>
+  <tr><td>VARCO 3D</td><td>Texturizado asistido por IA de modelos de entorno (templo flotante, árbol de otoño, portal rúnico, estatua de águila): Base Color, Normal Map y materiales URP.</td></tr>
+  <tr><td>Claude Code (Anthropic)</td><td>Fase final: menú principal, tutorial, HUD, cofre y experiencia, pantalla de trazo, sincronización de progreso, animaciones de golems, herramientas de editor, endpoints y migraciones del backend, pruebas automatizadas, CHANGELOG y este documento.</td></tr>
 </table>
 <p>Revisión humana: cada cambio se probó en el Editor y/o con pruebas automatizadas antes de confirmarse. <span class="pending">completar con otros usos de IA del equipo (imágenes, audio, textos), si los hubo</span></p>
 
 <h2>Anexo D — Lista de chequeo del instructor</h2>
 <table>
   <tr><th>Criterio</th><th>Estado</th><th>Evidencia</th></tr>
-  <tr><td>Menú principal funcional, créditos, instructivo, flujo navegable</td><td class="ok">Cumple</td><td>Escena de menú con Jugar, Instructivo, Créditos y Cerrar sesión; tutorial y botón de ayuda.</td></tr>
+  <tr><td>Menú principal funcional, créditos, instructivo, flujo navegable</td><td class="ok">Cumple</td><td>Menú con Jugar, Instructivo, Créditos y Cerrar sesión; tutorial y botón de ayuda.</td></tr>
   <tr><td>Mecánica principal con inicio y condiciones finales</td><td class="ok">Cumple</td><td>Apartados 4, 5 y 7.</td></tr>
-  <tr><td>Estabilidad (95-98 %), sin cierres inesperados</td><td class="part">Por verificar</td><td>Falta la prueba en dispositivo (apartado 11).</td></tr>
+  <tr><td>Estabilidad (95-98 %), sin cierres inesperados</td><td class="part">Por verificar</td><td>Falta la prueba en dispositivo (apartado 12).</td></tr>
   <tr><td>Arte 3D/2D, texturas 1024 × 1024, interfaz y audio integrados</td><td class="ok">Cumple</td><td>Tope de importación de 1024 en texturas 3D; audio y música integrados.</td></tr>
   <tr><td>HUD e indicadores (tiempo, estrellas, puntuación)</td><td class="ok">Cumple</td><td>Apartado 6.</td></tr>
 </table>
 
 <h2>Créditos y licencias</h2>
-<p><b>Darkmeridional studio games</b> · Proyecto Productivo · SENA. Recursos de terceros: Kevin Iglesias (Humanoid Giant), Mixamo (animaciones), Hovl Studio (Magic Effects), SineVFX, TriForge Assets, Selcuk Gerceker (Toon Environments), IgniteCoders (Simple Water Shader), Reversed Interactive (The Portal Collection), Polytope Studio, IL3DN, Whaleride, Zacxophone, Pixit Games. Hecho con Unity 6. Cada recurso se usa conforme a la licencia de su proveedor.</p>
+<p><b>Darkmeridional Studio Games</b> · Proyecto Productivo · SENA. Autor principal: Mario Andrés Jaramillo Arias. Recursos de terceros: Kevin Iglesias (Humanoid Giant), Mixamo (animaciones), Hovl Studio (Magic Effects), SineVFX, Reversed Interactive (The Portal Collection), TriForge Assets, Selcuk Gerceker (Toon Environments), IgniteCoders (Simple Water Shader), Polytope Studio, IL3DN, Whaleride, Zacxophone, Pixit Games (Pixit Undersea), 25 RPG Game Tracks y Casual Game Sounds U6. Hecho con Unity 6. Cada recurso se usa conforme a la licencia de su proveedor.</p>
 
 </body>
 </html>

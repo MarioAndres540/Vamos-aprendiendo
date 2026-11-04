@@ -41,7 +41,7 @@ namespace VamosAprendiendo.EditorTools
         private const string CreditsText =
             "<b><color=#6B57DD>Darkmeridional studio games</color></b>\n" +
             "Proyecto Productivo · SENA\n" +
-            "Desarrollo y diseño: Mario Andrés\n\n" +
+            "Desarrollo y diseño: Mario Andrés Jaramillo Arias\n\n" +
             "<b><color=#6B57DD>Arte, animación y efectos de terceros</color></b>\n" +
             "Kevin Iglesias (Humanoid Giant) · Mixamo (animaciones) · Hovl Studio (Magic Effects) · SineVFX · " +
             "TriForge Assets · Selcuk Gerceker (Toon Environments) · IgniteCoders (Simple Water Shader) · " +

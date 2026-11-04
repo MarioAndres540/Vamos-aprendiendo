@@ -8,6 +8,12 @@ El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1
 
 ## [Unreleased] - Por Desarrollar
 
+### Cambiado — GDD alineado con el PMV 3 y limpieza del repositorio (2026-11-04)
+- `Docs/GDD_Vamos_Aprendiendo` (.html y .pdf) actualizado como versión 4.0 con los datos reales del PMV 3 y la bitácora (autor, centro, ficha, instructor, repositorios, herramientas de IA, requisitos del sistema, versiones e incidencias) y los cambios de esta fase.
+- **Bug 3 de la bitácora (Cinemachine):** se retiraron de `BaseScene` los 4 componentes de Cinemachine que quedaron sin paquete (Main Camera y CinemachineCamera); la cámara usa `SmoothThirdPersonCamera`. Ninguna escena de la compilación tiene scripts faltantes.
+- **Bug 4 (autoguardados):** `Assets/_Recovery/` salió del control de versiones y entró al `.gitignore`.
+- Créditos del menú principal con el nombre completo del autor.
+
 ### Agregado — Preparación de la entrega del PMV (2026-11-03)
 - **Tiempo en el HUD:** `PlayerHudUI.timeLabel` muestra el tiempo de juego de la sesión bajo la barra de experiencia (el reloj sobrevive a los cambios de escena y se reinicia al entrar otra cuenta o hijo). El panel del HUD pasa a 196 px de alto.
 - **Texturas a 1024:** `Tools/Optimization/Textures - Cap to 1024` (`TextureBudgetTool`) bajó el tope de importación de 280 texturas 3D/entorno a 1024; se exceptúan sprites de interfaz, cielos e iconos. Es reversible con `Textures - Restore Texture Limits (2048)` y los archivos originales no cambian.

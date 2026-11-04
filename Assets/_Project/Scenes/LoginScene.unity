@@ -3420,6 +3420,7 @@ MonoBehaviour:
   googleLoginButton: {fileID: 0}
   appleLoginButton: {fileID: 0}
   registerButton: {fileID: 1053375745}
+  registerUrl: 
   feedbackText: {fileID: 1150129711}
   feedbackCanvasGroup: {fileID: 1548900030}
   loadingOverlay: {fileID: 1331798589}

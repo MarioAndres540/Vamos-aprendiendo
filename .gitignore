@@ -86,3 +86,6 @@ crashlytics-build.properties
 *_bak*.hipnc
 
 *.DS_Store
+# Autoguardados de recuperación del editor (no deben versionarse)
+/Assets/_Recovery/
+/Assets/_Recovery.meta
