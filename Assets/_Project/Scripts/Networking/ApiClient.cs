@@ -18,6 +18,21 @@ public class ApiClient : MonoBehaviour
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
         DontDestroyOnLoad(gameObject);
+        ApplyConfiguredUrl();
+    }
+
+    /// <summary>
+    /// Si existe Resources/api_base_url.txt (una línea con la dirección pública del backend, p. ej. https://api.midominio.com/api/v1)
+    /// se usa esa en lugar de la de la escena. Así una compilación apunta al servidor publicado sin tocar escenas; sin el archivo
+    /// se usa la de la escena (localhost en el Editor). Se crea con Tools/Build/Set Backend URL from Clipboard.
+    /// </summary>
+    private void ApplyConfiguredUrl()
+    {
+        var config = Resources.Load<TextAsset>("api_base_url");
+        if (config == null) return;
+        string url = config.text.Trim().TrimEnd('/');
+        if (url.StartsWith("http://") || url.StartsWith("https://")) baseUrl = url;
+        else Debug.LogWarning("[Api] api_base_url.txt no trae una dirección http(s) válida: se ignora.");
     }
 
     /// <summary>POST con cuerpo serializado por JsonUtility y respuesta tipada (login, etc.).</summary>

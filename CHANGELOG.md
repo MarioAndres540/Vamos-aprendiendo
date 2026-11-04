@@ -8,6 +8,17 @@ El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1
 
 ## [Unreleased] - Por Desarrollar
 
+### Agregado — Preparación de la entrega del PMV (2026-11-03)
+- **Tiempo en el HUD:** `PlayerHudUI.timeLabel` muestra el tiempo de juego de la sesión bajo la barra de experiencia (el reloj sobrevive a los cambios de escena y se reinicia al entrar otra cuenta o hijo). El panel del HUD pasa a 196 px de alto.
+- **Texturas a 1024:** `Tools/Optimization/Textures - Cap to 1024` (`TextureBudgetTool`) bajó el tope de importación de 280 texturas 3D/entorno a 1024; se exceptúan sprites de interfaz, cielos e iconos. Es reversible con `Textures - Restore Texture Limits (2048)` y los archivos originales no cambian.
+- **Compilación:** las escenas vacías (`MathOperation_2D`, `Maze_3D`, `Memory_3D`, `PlatformJump_25D`) salieron de la compilación; quedan Login, Menú principal, Mundo, Tu ruta y los dos retos de trazo.
+- **Backend público en las compilaciones:** `ApiClient` usa la dirección de `Resources/api_base_url.txt` si existe. `Tools/Build/Set Backend URL from Clipboard`, `Build Windows` y `Build Android APK` (`BuildTool`). En Android usar una dirección https.
+- **GDD final:** `Docs/GDD_Vamos_Aprendiendo.html` y `.pdf` (con anexos de requisitos, manual de usuario, uso de IA y lista de chequeo). Los campos marcados en amarillo quedan por completar.
+
+### Cambiado — "Regístrate" abre la página de registro (2026-11-03)
+- El botón "Regístrate" del login abre en el navegador del dispositivo la página web donde se hace el registro (el tutor llena sus datos y los de su hijo; después inicia sesión en la app). La dirección está en `LoginUI.registerUrl` (escena `LoginScene`); mientras esté vacía, el botón avisa que el registro estará disponible pronto en vez de fallar.
+- Para la grabación del video: este flujo (registro en la web → inicio de sesión en la app) cuenta como parte de lo que se muestra.
+
 ### Agregado — Menú principal con instructivo y créditos (2026-11-03)
 - Nueva escena `MainMenuScene` (`Tools/Scenes/Build Main Menu Scene`, `MainMenuUI`), entre el login y el mundo: **Jugar** (carga el mundo con la pantalla de carga), **Instructivo** (objetivo y controles; "Ver el tutorial" lo vuelve a lanzar), **Créditos** (estudio, autoría y recursos de terceros) y **Cerrar sesión**. Saluda con el nombre de quien juega.
 - `LoginUI.targetSceneName` ahora es `MainMenuScene`; la escena quedó en la compilación justo después de `LoginScene`.

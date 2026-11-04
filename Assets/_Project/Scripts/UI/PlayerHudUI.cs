@@ -17,6 +17,8 @@ namespace VamosAprendiendo.UI
         [SerializeField] private TMP_Text nameLabel;
         [SerializeField] private Image fill;
         [SerializeField] private TMP_Text xpLabel;
+        [Tooltip("Tiempo de juego de esta sesión (desde que la cuenta entró a la app)")]
+        [SerializeField] private TMP_Text timeLabel;
         [Tooltip("Segundos que tarda la barra y el número en llegar al valor nuevo")]
         [SerializeField] private float animationSeconds = 0.8f;
 
@@ -26,10 +28,51 @@ namespace VamosAprendiendo.UI
         private float _targetFill;
         private Coroutine _animation;
 
+        // El reloj de la sesión sobrevive a los cambios de escena y se reinicia al entrar otra cuenta o hijo
+        private static float _sessionStart = -1f;
+        private static string _sessionOwner;
+        private int _shownSeconds = -1;
+
         private void OnEnable()
         {
             MissionRewards.Changed += OnClaimed;
             Refresh();
+            EnsureClock();
+            ShowTime();
+        }
+
+        private void Update()
+        {
+            // Tiempo sin escala: sigue contando aunque el juego esté en pausa o el tutorial lo detenga
+            ShowTime();
+        }
+
+        private static string Owner()
+        {
+            var session = PlayerSession.Instance;
+            if (session == null) return "guest";
+            string user = session.CurrentUser != null && !string.IsNullOrEmpty(session.CurrentUser.id) ? session.CurrentUser.id : "guest";
+            return user + "." + (session.CurrentStudentId ?? "own");
+        }
+
+        private static void EnsureClock()
+        {
+            string owner = Owner();
+            if (_sessionStart < 0f || owner != _sessionOwner)
+            {
+                _sessionStart = Time.realtimeSinceStartup;
+                _sessionOwner = owner;
+            }
+        }
+
+        private void ShowTime()
+        {
+            if (timeLabel == null || _sessionStart < 0f) return;
+            int seconds = Mathf.Max(0, Mathf.FloorToInt(Time.realtimeSinceStartup - _sessionStart));
+            if (seconds == _shownSeconds) return;
+            _shownSeconds = seconds;
+            int h = seconds / 3600, m = seconds % 3600 / 60, s = seconds % 60;
+            timeLabel.text = h > 0 ? $"Tiempo  {h}:{m:00}:{s:00}" : $"Tiempo  {m:00}:{s:00}";
         }
 
         private void OnDisable()

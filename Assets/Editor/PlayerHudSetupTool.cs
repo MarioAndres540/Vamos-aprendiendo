@@ -40,7 +40,7 @@ namespace VamosAprendiendo.EditorTools
             var panel = NewRect("Hud_Panel", canvasObj.transform);
             panel.anchorMin = panel.anchorMax = panel.pivot = new Vector2(0f, 1f);
             panel.anchoredPosition = new Vector2(40f, -40f);
-            panel.sizeDelta = new Vector2(520f, 150f);
+            panel.sizeDelta = new Vector2(520f, 196f);
             var panelImg = panel.gameObject.AddComponent<Image>();
             panelImg.sprite = round;
             panelImg.type = Image.Type.Sliced;
@@ -52,7 +52,7 @@ namespace VamosAprendiendo.EditorTools
             nameLabel.text = "Jugador";
 
             var barBack = NewRect("Xp_Back", panel);
-            Place(barBack, new Vector2(30f, 20f), new Vector2(-30f, 70f), fromBottom: true);
+            Place(barBack, new Vector2(30f, 62f), new Vector2(-30f, 112f), fromBottom: true);
             var backImg = barBack.gameObject.AddComponent<Image>();
             backImg.sprite = round;
             backImg.type = Image.Type.Sliced;
@@ -76,11 +76,16 @@ namespace VamosAprendiendo.EditorTools
             xpLabel.outlineWidth = 0.25f;
             xpLabel.outlineColor = new Color32(60, 30, 0, 255);
 
+            var timeLabel = NewText("Time", panel, 30f, FontStyles.Bold, new Color(1f, 0.93f, 0.75f, 0.9f), TextAlignmentOptions.MidlineLeft);
+            Place(timeLabel.rectTransform, new Vector2(30f, 10f), new Vector2(-30f, 54f), fromBottom: true);
+            timeLabel.text = "Tiempo  00:00";
+
             var hud = canvasObj.AddComponent<PlayerHudUI>();
             var so = new SerializedObject(hud);
             so.FindProperty("nameLabel").objectReferenceValue = nameLabel;
             so.FindProperty("fill").objectReferenceValue = fillImg;
             so.FindProperty("xpLabel").objectReferenceValue = xpLabel;
+            so.FindProperty("timeLabel").objectReferenceValue = timeLabel;
             so.ApplyModifiedProperties();
 
             var uiGroup = GameObject.Find("--- [UI] ---");

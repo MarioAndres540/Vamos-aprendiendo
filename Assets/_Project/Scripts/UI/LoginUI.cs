@@ -30,6 +30,8 @@ namespace VamosAprendiendo.UI
         [SerializeField] private Button googleLoginButton;
         [SerializeField] private Button appleLoginButton;
         [SerializeField] private Button registerButton;
+        [Tooltip("Página web donde se hace el registro (el tutor llena sus datos y los de su hijo). Se abre en el navegador del dispositivo. Vacío: aún no está publicada.")]
+        [SerializeField] private string registerUrl = "";
 
         [Header("Feedback / Toast")]
         [SerializeField] private TMP_Text feedbackText;
@@ -70,7 +72,7 @@ namespace VamosAprendiendo.UI
                 appleLoginButton.onClick.AddListener(() => QuickLogin("Apple"));
 
             if (registerButton != null)
-                registerButton.onClick.AddListener(() => ShowFeedback("Redirigiendo a registro..."));
+                registerButton.onClick.AddListener(OpenRegistration);
 
             if (feedbackCanvasGroup != null)
             {
@@ -315,6 +317,23 @@ namespace VamosAprendiendo.UI
                 if (session.IsAdultsAudience && !string.IsNullOrEmpty(adultsSceneName)) return adultsSceneName;
             }
             return targetSceneName;
+        }
+
+        /// <summary>
+        /// El registro se hace en la página web: el tutor llena el formulario con sus datos y los de su hijo y después inicia
+        /// sesión aquí. Abre esa página en el navegador predeterminado del dispositivo.
+        /// </summary>
+        private void OpenRegistration()
+        {
+            bool valid = !string.IsNullOrWhiteSpace(registerUrl)
+                         && (registerUrl.StartsWith("https://") || registerUrl.StartsWith("http://"));
+            if (!valid)
+            {
+                ShowFeedback("El registro se hace en nuestra página web. Estará disponible muy pronto.");
+                return;
+            }
+            ShowFeedback("Abriendo el registro en tu navegador. Cuando termines, inicia sesión aquí.");
+            Application.OpenURL(registerUrl.Trim());
         }
 
         public void TogglePasswordVisibility()
