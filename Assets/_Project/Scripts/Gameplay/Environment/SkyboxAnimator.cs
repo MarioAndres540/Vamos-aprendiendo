@@ -24,6 +24,8 @@ namespace VamosAprendiendo.Gameplay
             public Color hazeColor = new Color(0.82f, 0.92f, 0.95f);
             [Tooltip("Segundos que dura este momento del día antes de pasar al siguiente")]
             public float holdSeconds = 60f;
+            [Tooltip("Marca los momentos que cuentan como noche (música y otros sistemas)")]
+            public bool isNight;
         }
 
         [Header("Cielo")]
@@ -41,6 +43,11 @@ namespace VamosAprendiendo.Gameplay
 
         /// <summary>Color de bruma del momento actual (ya atenuado por la transición). a = 0 si no hay ciclo activo.</summary>
         public static Color CurrentHaze { get; private set; } = new Color(0f, 0f, 0f, 0f);
+
+        /// <summary>Verdadero mientras el ciclo está en un momento marcado como noche.</summary>
+        public static bool IsNight { get; private set; }
+        /// <summary>Se dispara cuando el ciclo cambia entre día y noche.</summary>
+        public static event Action<bool> NightChanged;
 
         private static readonly int RotationId = Shader.PropertyToID("_Rotation");
         private static readonly int ExposureId = Shader.PropertyToID("_Exposure");
@@ -127,6 +134,11 @@ namespace VamosAprendiendo.Gameplay
                 sun.transform.rotation = Quaternion.Euler(phase.sunEuler);
             }
             _current = phase;
+            if (phase.isNight != IsNight)
+            {
+                IsNight = phase.isNight;
+                NightChanged?.Invoke(IsNight);
+            }
             _sunIntensity = phase.sunIntensity;
             DynamicGI.UpdateEnvironment(); // actualiza la luz ambiente con el nuevo cielo
         }
@@ -143,6 +155,7 @@ namespace VamosAprendiendo.Gameplay
         private void OnDestroy()
         {
             CurrentHaze = new Color(0f, 0f, 0f, 0f);
+            IsNight = false;
             if (_runtime != null) Destroy(_runtime);
         }
     }

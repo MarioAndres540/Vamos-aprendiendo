@@ -4,7 +4,7 @@ namespace VamosAprendiendo.Gameplay
 {
     /// <summary>
     /// Conecta el movimiento del jugador con el Animator del personaje (Encapuchado):
-    /// parámetro "Speed" según la velocidad real, disparador "Saltar" al despegar y "Festejar" bajo demanda.
+    /// parámetro "Speed" según la velocidad real, "Grounded" (suelo), disparador "Saltar" al despegar y "Festejar" bajo demanda.
     /// Va en el objeto Player; el Animator está en el modelo hijo.
     /// </summary>
     [RequireComponent(typeof(PlayerController))]
@@ -13,6 +13,7 @@ namespace VamosAprendiendo.Gameplay
         private static readonly int SpeedId = Animator.StringToHash("Speed");
         private static readonly int JumpId = Animator.StringToHash("Saltar");
         private static readonly int CelebrateId = Animator.StringToHash("Festejar");
+        private static readonly int GroundedId = Animator.StringToHash("Grounded");
 
         [SerializeField] private Animator animator;
         [Tooltip("Suavizado del parámetro Speed (evita parpadeos entre Idle y Caminar)")]
@@ -23,6 +24,7 @@ namespace VamosAprendiendo.Gameplay
         private PlayerController _player;
         private float _speed;
         private float _speedVelocity;
+        private float _airLockUntil;
 
         public void SetAnimator(Animator a) => animator = a;
 
@@ -50,6 +52,8 @@ namespace VamosAprendiendo.Gameplay
             float target = _player.enabled ? _player.CurrentSpeed : 0f;
             _speed = Mathf.SmoothDamp(_speed, target, ref _speedVelocity, speedSmoothTime);
             animator.SetFloat(SpeedId, _speed);
+            // Tras despegar, Grounded sigue en falso un instante: en el primer cuadro el controlador todavía reporta suelo.
+            animator.SetBool(GroundedId, _player.IsGrounded && Time.time >= _airLockUntil);
             animator.speed = _speed > 0.1f && _player.IsGrounded
                 ? Mathf.Clamp(_speed / Mathf.Max(0.01f, _player.MaxSpeed) * walkAnimationScale, 0.5f, 1.4f)
                 : 1f;
@@ -57,7 +61,12 @@ namespace VamosAprendiendo.Gameplay
 
         private void OnJumped()
         {
-            if (animator != null) animator.SetTrigger(JumpId);
+            _airLockUntil = Time.time + 0.15f;
+            if (animator != null)
+            {
+                animator.SetBool(GroundedId, false);
+                animator.SetTrigger(JumpId);
+            }
         }
 
         /// <summary>Reproduce la animación de festejo (por ejemplo al completar un reto).</summary>

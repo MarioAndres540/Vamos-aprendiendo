@@ -27,7 +27,8 @@ public class AuthService : MonoBehaviour
     {
         if (string.Equals(email, OfflineTestUser, StringComparison.OrdinalIgnoreCase) && password == OfflineTestPassword)
         {
-            var user = new UserDataDto { id = "offline-test", email = OfflineTestUser, role = "student", isActive = true };
+            // Se comporta como un tester: sin audience, la app deja elegir la versión (niños o adultos)
+            var user = new UserDataDto { id = "offline-test", email = OfflineTestUser, role = "test", isActive = true, profileType = "tester" };
             PlayerSession.Instance.SetOfflineSession(user);
             onSuccess?.Invoke(new LoginResponseDto { user = user });
             return;
@@ -88,6 +89,8 @@ public class AuthService : MonoBehaviour
             {
                 var tokens = JsonUtility.FromJson<TokenResponseDto>(raw);
                 session.UpdateTokens(tokens.accessToken, tokens.refreshToken); // guardar siempre el último
+                // Al reabrir la app con el token guardado, el perfil y el público solo llegan por aquí
+                session.UpdateProfile(tokens.profileType, tokens.audience, tokens.user);
             },
             onError: error =>
             {

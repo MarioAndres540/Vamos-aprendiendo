@@ -31,10 +31,13 @@ namespace VamosAprendiendo.UI
         [SerializeField] private bool floating = true;
         [Range(0f, 1f)]
         [SerializeField] private float restAlpha = 0.35f;
-        [Tooltip("Distancia del mando en reposo a la esquina inferior izquierda de la zona táctil")]
-        [SerializeField] private float restMargin = 90f;
+        [Tooltip("Distancia del borde del mando en reposo a la esquina inferior izquierda (el botón de salto usa el mismo margen en la derecha)")]
+        [SerializeField] private float restMargin = 110f;
+        [Tooltip("Distancia del borde inferior al mando en reposo; con -1 usa el mismo margen que a la izquierda. Sirve para dejarlo a la altura del botón de salto")]
+        [SerializeField] private float restMarginBottom = -1f;
 
         private Vector2 _restPosition;
+        private Vector2 _restRectSize;
         private Vector2 _origin;
         private CanvasGroup _group;
 
@@ -57,10 +60,24 @@ namespace VamosAprendiendo.UI
 
         private void Start()
         {
-            // Posición de reposo: esquina inferior izquierda de la zona táctil, a modo de pista visual.
+            Canvas.ForceUpdateCanvases(); // sin esto el rect de la zona puede estar sin escalar y el mando queda mal ubicado
+            RefreshRestPosition();
+        }
+
+        private void Update()
+        {
+            // Si cambia el tamaño de la pantalla (rotación, ventana del simulador) el mando en reposo se recoloca.
+            if (!IsPressed && touchArea != null && touchArea.rect.size != _restRectSize) RefreshRestPosition();
+        }
+
+        // Posición de reposo: esquina inferior izquierda de la zona táctil, a modo de pista visual.
+        private void RefreshRestPosition()
+        {
             if (background == null) return;
             Rect r = touchArea.rect;
-            _restPosition = new Vector2(r.xMin + restMargin + Radius, r.yMin + restMargin + Radius);
+            _restRectSize = r.size;
+            float bottom = restMarginBottom >= 0f ? restMarginBottom : restMargin;
+            _restPosition = new Vector2(r.xMin + restMargin + Radius, r.yMin + bottom + Radius);
             background.anchoredPosition = _restPosition;
         }
 

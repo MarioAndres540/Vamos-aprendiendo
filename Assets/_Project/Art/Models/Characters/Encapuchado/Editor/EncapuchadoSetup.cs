@@ -21,22 +21,40 @@ public static class EncapuchadoSetup
     static readonly string[] Clips = { "Idle", "Caminar", "Saltar", "Festejar" };
     static readonly string[] Looping = { "Idle", "Caminar" };
 
-    struct MatDef
+    const string TexDir = Dir + "/Textures";
+
+    class MatDef
     {
-        public string Name; public Color BaseLinear; public float Smoothness; public Color EmissionLinear; public float EmissionMult;
-        public MatDef(string n, Color b, float s, Color e, float m) { Name = n; BaseLinear = b; Smoothness = s; EmissionLinear = e; EmissionMult = m; }
+        public string Name; public Color BaseLinear = Color.white; public float Smoothness = 0.1f;
+        public Color EmissionLinear = Color.black; public float EmissionMult;
+        public string BaseMap, EmissionMap, NormalMap; public float NormalScale = 1f; public Vector2 Tiling = Vector2.one;
+        public string DetailAlbedo, DetailNormal; public float DetailNormalScale = 1f; public Vector2 DetailTiling = Vector2.one;
     }
 
-    // Valores lineales tomados de los materiales de Blender
+    // Valores lineales y texturas tomados de los materiales de Blender
     static readonly MatDef[] Mats =
     {
-        new MatDef("M_NegroAzabache",  new Color(0.018f, 0.018f, 0.020f), 0.10f, Color.black, 0f),
-        new MatDef("M_BlancoRostro",   new Color(0.850f, 0.830f, 0.800f), 0.55f, Color.black, 0f),
-        new MatDef("M_OjosNegros",     new Color(0.003f, 0.003f, 0.003f), 0.75f, Color.black, 0f),
-        new MatDef("M_Pies",           new Color(0.020f, 0.020f, 0.025f), 0.40f, Color.black, 0f),
-        new MatDef("M_VerdeLuminoso",  new Color(0.120f, 0.550f, 0.020f), 0.40f, new Color(0.22f, 1.0f, 0.02f), 2.0f),
-        new MatDef("M_EspiralBufanda", new Color(0.350f, 0.900f, 0.080f), 0.40f, new Color(0.42f, 1.0f, 0.08f), 3.0f),
-        new MatDef("M_AzulRunas",      new Color(0.050f, 0.400f, 1.000f), 0.50f, new Color(0.05f, 0.5f, 1.0f), 4.0f),
+        new MatDef { Name = "M_CapaTela", BaseMap = "Capa_BaseColor", EmissionMap = "Capa_Emision", NormalMap = "Capa_Normal",
+                     NormalScale = 0.3f, Smoothness = 0.05f, EmissionLinear = Color.white, EmissionMult = 1.6f,
+                     DetailAlbedo = "Lana_Detalle", DetailNormal = "Lana_Normal", DetailNormalScale = 0.9f, DetailTiling = new Vector2(9f, 3.5f) },
+        new MatDef { Name = "M_CapuchaTela", BaseMap = "Lana_Oscura", NormalMap = "Lana_Normal", NormalScale = 0.6f,
+                     Smoothness = 0.15f, Tiling = new Vector2(8, 8) },
+        new MatDef { Name = "M_Bufanda", BaseMap = "Bufanda_BaseColor", EmissionMap = "Bufanda_Emision", NormalMap = "Bufanda_Normal",
+                     NormalScale = 0.5f, Smoothness = 0.2f, EmissionLinear = Color.white, EmissionMult = 1.6f },
+        new MatDef { Name = "M_BufandaCuello", BaseMap = "Verde_Tela", NormalMap = "Lana_Normal", NormalScale = 0.6f,
+                     Smoothness = 0.2f, Tiling = new Vector2(10, 10), EmissionLinear = new Color(0.22f, 1f, 0.02f), EmissionMult = 0.45f },
+        new MatDef { Name = "M_BlancoRostro", BaseLinear = new Color(0.80f, 0.76f, 0.67f), Smoothness = 0.58f,
+                     EmissionLinear = new Color(0.80f, 0.76f, 0.67f), EmissionMult = 0.18f },
+        new MatDef { Name = "M_OjosNegros", BaseLinear = new Color(0.003f, 0.003f, 0.003f), Smoothness = 0.75f },
+        new MatDef { Name = "M_Pies", BaseLinear = new Color(0.02f, 0.02f, 0.025f), Smoothness = 0.4f },
+        new MatDef { Name = "M_AzulRunas", BaseLinear = new Color(0.05f, 0.55f, 1f), Smoothness = 0.5f,
+                     EmissionLinear = new Color(0.05f, 0.6f, 1f), EmissionMult = 2.2f },
+        // materiales de versiones anteriores (por si algún FBX viejo los referencia)
+        new MatDef { Name = "M_NegroAzabache", BaseLinear = new Color(0.018f, 0.018f, 0.02f), Smoothness = 0.1f },
+        new MatDef { Name = "M_VerdeLuminoso", BaseLinear = new Color(0.12f, 0.55f, 0.02f), Smoothness = 0.4f,
+                     EmissionLinear = new Color(0.22f, 1f, 0.02f), EmissionMult = 2f },
+        new MatDef { Name = "M_EspiralBufanda", BaseLinear = new Color(0.35f, 0.9f, 0.08f), Smoothness = 0.4f,
+                     EmissionLinear = new Color(0.42f, 1f, 0.08f), EmissionMult = 3f },
     };
 
     [MenuItem("Tools/Encapuchado/1. Configurar personaje (materiales, clips, Animator, prefab)")]
@@ -137,6 +155,21 @@ public static class EncapuchadoSetup
             imp.AddRemap(new AssetImporter.SourceAssetIdentifier(typeof(Material), kv.Key), kv.Value);
     }
 
+    static Texture2D Tex(string name, bool normal)
+    {
+        if (string.IsNullOrEmpty(name)) return null;
+        string p = $"{TexDir}/{name}.png";
+        var ti = AssetImporter.GetAtPath(p) as TextureImporter;
+        if (ti == null) { Debug.LogWarning("Falta textura " + p); return null; }
+        bool dirty = false;
+        if (normal && ti.textureType != TextureImporterType.NormalMap) { ti.textureType = TextureImporterType.NormalMap; dirty = true; }
+        if (!normal && !ti.sRGBTexture) { ti.sRGBTexture = true; dirty = true; }
+        if (ti.maxTextureSize < 2048) { ti.maxTextureSize = 2048; dirty = true; }
+        if (ti.wrapMode != TextureWrapMode.Repeat) { ti.wrapMode = TextureWrapMode.Repeat; dirty = true; }
+        if (dirty) ti.SaveAndReimport();
+        return AssetDatabase.LoadAssetAtPath<Texture2D>(p);
+    }
+
     static Dictionary<string, Material> CreateMaterials()
     {
         if (!AssetDatabase.IsValidFolder(MatDir)) AssetDatabase.CreateFolder(Dir, "Materials");
@@ -148,11 +181,28 @@ public static class EncapuchadoSetup
             var m = AssetDatabase.LoadAssetAtPath<Material>(p);
             if (m == null) { m = new Material(shader); AssetDatabase.CreateAsset(m, p); }
             m.shader = shader;
-            m.SetColor("_BaseColor", d.BaseLinear.gamma);
+            var baseTex = Tex(d.BaseMap, false);
+            m.SetTexture("_BaseMap", baseTex);
+            m.SetColor("_BaseColor", baseTex != null ? Color.white : d.BaseLinear.gamma);
+            m.SetTextureScale("_BaseMap", d.Tiling);
             m.SetFloat("_Smoothness", d.Smoothness);
             m.SetFloat("_Metallic", 0f);
+
+            var nrm = Tex(d.NormalMap, true);
+            m.SetTexture("_BumpMap", nrm);
+            m.SetFloat("_BumpScale", d.NormalScale);
+            if (nrm != null) m.EnableKeyword("_NORMALMAP"); else m.DisableKeyword("_NORMALMAP");
+
+            var detA = Tex(d.DetailAlbedo, false); var detN = Tex(d.DetailNormal, true);
+            m.SetTexture("_DetailAlbedoMap", detA); m.SetTexture("_DetailNormalMap", detN);
+            m.SetFloat("_DetailAlbedoMapScale", 1f); m.SetFloat("_DetailNormalMapScale", d.DetailNormalScale);
+            m.SetTextureScale("_DetailAlbedoMap", d.DetailTiling);
+            if (detA != null || detN != null) m.EnableKeyword("_DETAIL_MULX2"); else m.DisableKeyword("_DETAIL_MULX2");
+
             if (d.EmissionMult > 0f)
             {
+                var emiTex = Tex(d.EmissionMap, false);
+                m.SetTexture("_EmissionMap", emiTex);
                 // color HDR: la conversión gamma->lineal de Unity reproduce ~EmissionMult en lineal
                 var e = d.EmissionLinear.gamma * Mathf.Pow(d.EmissionMult, 1f / 2.2f);
                 e.a = 1f;
@@ -162,6 +212,7 @@ public static class EncapuchadoSetup
             }
             else
             {
+                m.SetTexture("_EmissionMap", null);
                 m.DisableKeyword("_EMISSION");
                 m.SetColor("_EmissionColor", Color.black);
                 m.globalIlluminationFlags = MaterialGlobalIlluminationFlags.EmissiveIsBlack;
@@ -181,6 +232,7 @@ public static class EncapuchadoSetup
         ctrl.AddParameter("Speed", AnimatorControllerParameterType.Float);
         ctrl.AddParameter("Saltar", AnimatorControllerParameterType.Trigger);
         ctrl.AddParameter("Festejar", AnimatorControllerParameterType.Trigger);
+        ctrl.AddParameter("Grounded", AnimatorControllerParameterType.Bool);
         var sm = ctrl.layers[0].stateMachine;
 
         AnimatorState Add(string n, Vector3 pos)
@@ -202,7 +254,7 @@ public static class EncapuchadoSetup
 
         var a = sm.AddAnyStateTransition(jump); a.hasExitTime = false; a.duration = 0.05f; a.canTransitionToSelf = false;
         a.AddCondition(AnimatorConditionMode.If, 0, "Saltar");
-        t = jump.AddTransition(idle); t.hasExitTime = true; t.exitTime = 0.95f; t.duration = 0.1f;
+        ConfigureJumpExit(sm, idle, walk, jump);
 
         a = sm.AddAnyStateTransition(party); a.hasExitTime = false; a.duration = 0.1f; a.canTransitionToSelf = false;
         a.AddCondition(AnimatorConditionMode.If, 0, "Festejar");
@@ -210,6 +262,44 @@ public static class EncapuchadoSetup
 
         EditorUtility.SetDirty(ctrl);
         return ctrl;
+    }
+
+    // El salto termina al tocar el suelo (parámetro Grounded) y sigue directo a Caminar si el jugador se mueve, o a Idle si está quieto.
+    // El clip dura 1,63 s pero el salto en el aire ~0,8 s, así que se acelera para que el aterrizaje coincida con el suelo.
+    static void ConfigureJumpExit(AnimatorStateMachine sm, AnimatorState idle, AnimatorState walk, AnimatorState jump)
+    {
+        foreach (var old in jump.transitions) jump.RemoveTransition(old);
+        var toWalk = jump.AddTransition(walk); toWalk.hasExitTime = false; toWalk.duration = 0.12f;
+        toWalk.AddCondition(AnimatorConditionMode.If, 0, "Grounded");
+        toWalk.AddCondition(AnimatorConditionMode.Greater, 0.1f, "Speed");
+        var toIdle = jump.AddTransition(idle); toIdle.hasExitTime = false; toIdle.duration = 0.15f;
+        toIdle.AddCondition(AnimatorConditionMode.If, 0, "Grounded");
+        toIdle.AddCondition(AnimatorConditionMode.Less, 0.1f, "Speed");
+        jump.speed = 1.8f;
+    }
+
+    [MenuItem("Tools/Encapuchado/3. Ajustar fin del salto (Animator)")]
+    public static void FixJumpExit()
+    {
+        var ctrl = AssetDatabase.LoadAssetAtPath<AnimatorController>(ControllerPath);
+        if (ctrl == null) { Debug.LogError("[Encapuchado] No existe " + ControllerPath); return; }
+        bool has = false;
+        foreach (var p in ctrl.parameters) if (p.name == "Grounded") has = true;
+        if (!has) ctrl.AddParameter("Grounded", AnimatorControllerParameterType.Bool);
+
+        var sm = ctrl.layers[0].stateMachine;
+        AnimatorState idle = null, walk = null, jump = null;
+        foreach (var cs in sm.states)
+        {
+            if (cs.state.name == "Idle") idle = cs.state;
+            else if (cs.state.name == "Caminar") walk = cs.state;
+            else if (cs.state.name == "Saltar") jump = cs.state;
+        }
+        if (idle == null || walk == null || jump == null) { Debug.LogError("[Encapuchado] Faltan estados Idle, Caminar o Saltar."); return; }
+        ConfigureJumpExit(sm, idle, walk, jump);
+        EditorUtility.SetDirty(ctrl);
+        AssetDatabase.SaveAssets();
+        Debug.Log("[Encapuchado] Saltar ahora termina al tocar el suelo y sigue a Caminar o Idle.");
     }
 
     static VolumeProfile CreateBloomProfile()

@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
@@ -14,6 +14,10 @@ namespace VamosAprendiendo.UI
     {
         [Header("Scene Navigation")]
         [SerializeField] private string targetSceneName = "BaseScene";
+        [Tooltip("Escena para el contenido de niños (audience = ninos). Vacío: se usa targetSceneName.")]
+        [SerializeField] private string kidsSceneName = "";
+        [Tooltip("Escena para el contenido de adultos (audience = adultos). Vacío: se usa targetSceneName.")]
+        [SerializeField] private string adultsSceneName = "";
         [SerializeField] private float minimumLoadingDuration = 2.2f;
 
         [Header("Inputs & Controls")]
@@ -152,8 +156,14 @@ namespace VamosAprendiendo.UI
                 yield break;
             }
             
+            // El tutor juega con un hijo: elegirlo antes de abrir la sesión para que quede a su nombre
+            yield return StudentsService.PrepareCurrentStudent();
+
             if (PresenceService.Instance != null)
                 PresenceService.Instance.StartAppSession();
+
+            // Escena según el contenido que corresponde al perfil (niños o adultos)
+            string sceneToLoad = ResolveTargetScene();
 
             // Activar y mostrar pantalla de carga
             if (loadingOverlay != null)
@@ -195,11 +205,16 @@ namespace VamosAprendiendo.UI
                 loadingCanvasGroup.alpha = 1f;
             }
 
+            // Con el login hecho se baja el progreso de las actividades (letras y números) para que la pantalla de
+            // actividades lo muestre al instante. Si no hay red se sigue con lo guardado en el dispositivo.
+            if (loadingStatusText != null) loadingStatusText.text = "Descargando tu progreso...";
+            yield return ProgressSyncService.Fetch();
+
             // Iniciar carga asíncrona de la escena
             AsyncOperation asyncOp = null;
-            if (!string.IsNullOrEmpty(targetSceneName) && Application.CanStreamedLevelBeLoaded(targetSceneName))
+            if (!string.IsNullOrEmpty(sceneToLoad) && Application.CanStreamedLevelBeLoaded(sceneToLoad))
             {
-                asyncOp = SceneManager.LoadSceneAsync(targetSceneName);
+                asyncOp = SceneManager.LoadSceneAsync(sceneToLoad);
             }
             else if (SceneManager.sceneCountInBuildSettings > 1)
             {
@@ -283,8 +298,23 @@ namespace VamosAprendiendo.UI
             }
             else
             {
-                SceneManager.LoadScene(targetSceneName);
+                SceneManager.LoadScene(sceneToLoad);
             }
+        }
+
+        /// <summary>
+        /// Escena de destino según PlayerSession.Audience: niños o adultos si están configuradas,
+        /// si no (o si el tester aún no elige versión) la escena general.
+        /// </summary>
+        private string ResolveTargetScene()
+        {
+            var session = PlayerSession.Instance;
+            if (session != null)
+            {
+                if (session.IsKidsAudience && !string.IsNullOrEmpty(kidsSceneName)) return kidsSceneName;
+                if (session.IsAdultsAudience && !string.IsNullOrEmpty(adultsSceneName)) return adultsSceneName;
+            }
+            return targetSceneName;
         }
 
         public void TogglePasswordVisibility()

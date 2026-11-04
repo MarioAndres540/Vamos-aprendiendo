@@ -173,10 +173,9 @@ namespace VamosAprendiendo.EditorTools
                 return;
             }
 
-            foreach (var sceneRoot in scene.GetRootGameObjects())
-            {
-                if (sceneRoot.name == "PauseButtonCanvas") Object.DestroyImmediate(sceneRoot);
-            }
+            // Puede estar dentro del grupo "--- [UI] ---", no solo en la raíz
+            foreach (var old in Object.FindObjectsByType<PauseButtonUI>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+                Object.DestroyImmediate(old.gameObject);
 
             var canvasObj = new GameObject("PauseButtonCanvas");
             Undo.RegisterCreatedObjectUndo(canvasObj, "Create Pause Button");
@@ -190,8 +189,9 @@ namespace VamosAprendiendo.EditorTools
             canvasObj.AddComponent<GraphicRaycaster>();
 
             var buttonRt = NewRect("Btn_Pause", canvasObj.transform);
-            buttonRt.anchorMin = buttonRt.anchorMax = buttonRt.pivot = new Vector2(0f, 1f);
-            buttonRt.anchoredPosition = new Vector2(40f, -40f);
+            // Arriba a la derecha, debajo del botón de audio (130 px + 24 px de separación); la esquina izquierda es del nombre y la experiencia
+            buttonRt.anchorMin = buttonRt.anchorMax = buttonRt.pivot = new Vector2(1f, 1f);
+            buttonRt.anchoredPosition = new Vector2(-40f, -194f);
             buttonRt.sizeDelta = new Vector2(130f, 130f);
 
             var img = buttonRt.gameObject.AddComponent<Image>();
@@ -208,6 +208,9 @@ namespace VamosAprendiendo.EditorTools
             so.FindProperty("pauseSprite").objectReferenceValue = pauseSprite;
             so.FindProperty("playSprite").objectReferenceValue = playSprite;
             so.ApplyModifiedProperties();
+
+            var uiGroup = GameObject.Find("--- [UI] ---");
+            if (uiGroup != null) canvasObj.transform.SetParent(uiGroup.transform, false);
 
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);

@@ -55,7 +55,10 @@ public class PresenceService : MonoBehaviour
 
         if (restored)
         {
-            Debug.Log("[Presence] Sesión reabierta con el token guardado.");
+            var session = PlayerSession.Instance;
+            Debug.Log($"[Presence] Sesión reabierta con el token guardado (perfil: {session.ProfileType}, contenido: {session.Audience ?? "sin definir"}).");
+            // El tutor juega con un hijo: elegirlo antes de abrir la sesión para que quede a su nombre
+            yield return StudentsService.PrepareCurrentStudent();
             StartAppSession();
         }
         else

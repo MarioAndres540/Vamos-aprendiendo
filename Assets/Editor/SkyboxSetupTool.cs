@@ -94,6 +94,7 @@ namespace VamosAprendiendo.EditorTools
             p.FindPropertyRelative("sunColor").colorValue = sunColor;
             p.FindPropertyRelative("sunIntensity").floatValue = intensity;
             p.FindPropertyRelative("holdSeconds").floatValue = hold;
+            p.FindPropertyRelative("isNight").boolValue = name == "Noche";
             p.FindPropertyRelative("sunEuler").vector3Value = sunEuler;
             p.FindPropertyRelative("hazeColor").colorValue = haze;
         }

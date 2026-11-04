@@ -10,13 +10,19 @@ public class StartSessionResponseDto
     public int timeoutSeconds;
 }
 
-/// <summary>Respuesta de POST /auth/refresh (mismos campos de tokens que el login).</summary>
+/// <summary>
+/// Respuesta de POST /auth/refresh: tokens nuevos y el perfil recalculado. Al reabrir la app con el token guardado
+/// es la única fuente de profileType y audience (el login no se repite).
+/// </summary>
 [Serializable]
 public class TokenResponseDto
 {
     public string accessToken;
     public string refreshToken;
     public int expiresIn;
+    public string profileType;
+    public string audience;
+    public UserDataDto user;
 }
 
 /// <summary>Error de una petición al backend, con el código HTTP y el `code` del backend si lo trae.</summary>

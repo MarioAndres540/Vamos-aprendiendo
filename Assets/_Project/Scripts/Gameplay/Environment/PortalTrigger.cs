@@ -39,6 +39,7 @@ namespace VamosAprendiendo.Gameplay
         private bool _used;
 
         public float ReturnOffset => returnOffset;
+        public string TargetSceneName => targetSceneName;
 
         private void Reset()
         {

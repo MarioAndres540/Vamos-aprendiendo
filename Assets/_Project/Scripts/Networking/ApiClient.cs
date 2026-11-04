@@ -88,11 +88,16 @@ public class ApiClient : MonoBehaviour
     {
         var request = new UnityWebRequest($"{baseUrl}{endpoint}", method)
         {
-            uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(string.IsNullOrEmpty(json) ? "{}" : json)),
             downloadHandler = new DownloadHandlerBuffer(),
             timeout = timeoutSeconds
         };
-        request.SetRequestHeader("Content-Type", "application/json");
+
+        // GET sin cuerpo: en Android e iOS una petición GET con cuerpo puede fallar
+        if (method != UnityWebRequest.kHttpVerbGET)
+        {
+            request.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(string.IsNullOrEmpty(json) ? "{}" : json));
+            request.SetRequestHeader("Content-Type", "application/json");
+        }
 
         if (withAuth && PlayerSession.Instance != null && !string.IsNullOrEmpty(PlayerSession.Instance.AccessToken))
         {

@@ -91,7 +91,7 @@ namespace VamosAprendiendo.EditorTools
             foreach (var mf in Object.FindObjectsByType<MeshFilter>(FindObjectsInactive.Include, FindObjectsSortMode.None))
             {
                 string n = mf.name;
-                bool target = n.StartsWith("Island_Grass_Rim") || n.StartsWith("Grass_Cap_Mini_Island") || n.StartsWith("Plataforma_uno");
+                bool target = n.StartsWith("Island_Grass_Rim") || n.StartsWith("Grass_Cap_Mini_Island") || n.StartsWith("Plataforma_uno") || n.StartsWith("Stylized_Tree");
                 if (!target || mf.sharedMesh == null) continue;
 
                 string safe = n.Replace(" ", "").Replace("(", "_").Replace(")", "");
@@ -111,7 +111,13 @@ namespace VamosAprendiendo.EditorTools
                 Rebuild(copy, mf.transform, false);
 
                 var r = mf.GetComponent<MeshRenderer>();
-                if (r != null)
+                if (r != null && n.StartsWith("Stylized_Tree_Canopy"))
+                {
+                    // La copa venía con el material de piso del bosque: se le da uno de hojas.
+                    Undo.RecordObject(r, "Material");
+                    r.sharedMaterial = GetLeafMaterial();
+                }
+                else if (r != null)
                 {
                     var mats = r.sharedMaterials;
                     bool changed = false;
@@ -135,6 +141,18 @@ namespace VamosAprendiendo.EditorTools
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
             Debug.Log($"[FixUv] Bordes de pasto, tapas y Plataforma_uno: {count} objetos con UV propias.");
+        }
+
+        private static Material GetLeafMaterial()
+        {
+            const string path = "Assets/_Project/Art/Materials/Islands/M_Hojas_Arbol.mat";
+            var mat = AssetDatabase.LoadAssetAtPath<Material>(path);
+            if (mat != null) return mat;
+            mat = new Material(Shader.Find("Universal Render Pipeline/Lit")) { name = "M_Hojas_Arbol" };
+            mat.SetColor("_BaseColor", new Color(0.36f, 0.62f, 0.32f));
+            mat.SetFloat("_Smoothness", 0.1f);
+            AssetDatabase.CreateAsset(mat, path);
+            return mat;
         }
 
         private static IEnumerable<GameObject> Collect()

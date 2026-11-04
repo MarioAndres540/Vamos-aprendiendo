@@ -61,15 +61,22 @@ namespace VamosAprendiendo.EditorTools
             scaler.referenceResolution = new Vector2(1920, 1080);
             scaler.matchWidthOrHeight = 1f; // ancho variable (16:9 a 20:9), alto fijo
             canvasObj.AddComponent<GraphicRaycaster>();
-            Transform root = canvasObj.transform;
+            Transform canvasRoot = canvasObj.transform;
 
-            // ---- elementos comunes ----
-            var bg = NewRect("Background", root);
+            // El fondo ocupa toda la pantalla; el resto se diseña en 1920x1080 dentro de un marco que se escala para caber
+            // en cualquier proporción (tabletas 4:3, móviles 20:9...) sin cortar ni solapar elementos.
+            var bg = NewRect("Background", canvasRoot);
             Stretch(bg);
             var bgImg = bg.gameObject.AddComponent<Image>();
             bgImg.sprite = background;
             bgImg.color = background != null ? Color.white : new Color(0.55f, 0.8f, 1f);
             bgImg.raycastTarget = false;
+
+            var frameRt = NewRect("Frame", canvasRoot);
+            Stretch(frameRt);
+            var contentRt = NewRect("Content", frameRt);
+            frameRt.gameObject.AddComponent<VamosAprendiendo.UI.DesignFrame>().Configure(contentRt, new Vector2(1920f, 1080f));
+            Transform root = contentRt;
 
             var mascotRt = NewRect("Mascot", root);
             Place(mascotRt, new Vector2(0, 1), new Vector2(50, -30), new Vector2(230, 230));
