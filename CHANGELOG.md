@@ -8,6 +8,14 @@ El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1
 
 ## [Unreleased] - Por Desarrollar
 
+### Agregado — Niveles: del nivel 1 al nivel 2 (2026-11-05)
+- **Barra de experiencia por nivel:** el HUD muestra la experiencia lograda sobre la que da todo el nivel 1 (`PlayerLevel.Level1Xp` = 64 ejercicios x 10 XP = 640), por ejemplo «40 / 640 XP», y al final de la tarjeta el nivel («NIVEL 1»).
+- **Portal cerrado hasta completar el nivel 1:** el portal azul de la primera isla (`LevelPortal`) está apagado hasta cobrar en el cofre las 64 actividades; si se intenta cruzar cerrado avisa «Portal cerrado… (x de 64)».
+- **Plataforma verde:** `Spiral_Lift_1` queda bloqueada hasta cruzar el portal abierto (`SpiralLift.Locked`); al cruzarlo aparece «¡Portal abierto!» y la plataforma sube al jugador al nivel 2.
+- **Llegada al nivel 2** (`LevelUpSequence`): el personaje pasa a «NIVEL 2» (se guarda por cuenta e hijo), se lanza una celebración bajo sus pies (Magic circle 2, Sparks explode yellow y Holy hit de Hovl Studio), sale el aviso «Esta zona está en construcción» y el personaje reaparece frente al pulpo (`Octopus_Front`).
+- **Pruebas sin completar las 64 actividades:** `Tools/Level/Tratar el nivel 1 como completo (prueba)` y `Tools/Level/Reiniciar el nivel`. Se arma con `Tools/Level/Setup Level System (BaseScene)`.
+- El nivel se guarda solo en el dispositivo; el backend y el dashboard todavía no lo conocen.
+
 ### Agregado — Voces de las letras y elección de backend en el Editor (2026-11-05)
 - **Voz de cada letra al empezar el ejercicio:** `LetterVoiceLibrary` (`Resources/LetterVoices.asset`, generada con `Tools/Audio/Build Letter Voice Library`) liga las 27 voces (5 vocales y 22 consonantes, la misma para mayúscula y minúscula). Al abrir una forma suena sola en cualquier modo de sonido salvo Silencio; el modo por defecto es Voz guía. Los números no tienen audio todavía.
 - **Los `.ogg` entregados estaban en formato Opus**, que Unity no importa (solo Vorbis): se convirtieron a WAV mono (con recorte de silencios) en las mismas carpetas y se importan comprimidos en Vorbis. Los originales quedaron en `Docs/Audio_originales_opus/`.

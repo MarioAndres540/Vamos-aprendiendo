@@ -135,13 +135,14 @@
   <li><b>Experiencia:</b> cada ejercicio aprobado vale 10 XP, una sola vez. La experiencia se <b>entrega al abrir el cofre</b>, no al aprobar: el HUD y el dashboard solo suman lo ya cobrado, y el dashboard avisa cuánto XP está por cobrar.</li>
   <li><b>Señales en el mundo:</b> «!» anuncia una misión nueva (al empezar o al terminar la ruta en curso); «?» indica experiencia por cobrar en el cofre.</li>
   <li><b>Tu ruta:</b> cada tarjeta muestra su porcentaje, una barra y una estrella al completarse.</li>
+  <li><b>Niveles:</b> el nivel 1 reúne las 64 actividades (640 XP). La barra de experiencia muestra el avance sobre ese total (por ejemplo «40 / 640 XP») y el nivel del jugador. Al cobrar toda la experiencia se abre el portal azul de la primera isla; al cruzarlo se activa la plataforma verde, que sube al jugador al nivel 2 con una celebración. El nivel 2 está en construcción: aparece un aviso y el personaje vuelve al frente del pulpo.</li>
 </ul>
 
 <h2>6. HUD e indicadores</h2>
 <table>
   <tr><th>Indicador</th><th>Dónde</th><th>Descripción</th></tr>
-  <tr><td>Nombre del jugador</td><td>Esquina superior izquierda</td><td>Nombre del estudiante que juega (o de la cuenta).</td></tr>
-  <tr><td>Experiencia (XP)</td><td>Barra bajo el nombre</td><td>Puntos cobrados en el cofre; la barra se llena con los ejercicios cobrados sobre el total.</td></tr>
+  <tr><td>Nombre y nivel</td><td>Esquina superior izquierda</td><td>Nombre del estudiante que juega (o de la cuenta) y su nivel («NIVEL 1»).</td></tr>
+  <tr><td>Experiencia (XP)</td><td>Barra bajo el nombre</td><td>Puntos cobrados en el cofre sobre el total del nivel (por ejemplo 40 / 640 XP); la barra se llena en proporción.</td></tr>
   <tr><td>Tiempo</td><td>Bajo la barra</td><td>Tiempo de juego de la sesión (mm:ss).</td></tr>
   <tr><td>Estrellas y porcentaje</td><td>Pantalla «Tu ruta»</td><td>Avance por ruta; estrella al llegar al 100 %.</td></tr>
   <tr><td>Controles</td><td>Columna derecha / esquinas</td><td>Joystick, salto, cámara, sonido, pausa y ayuda.</td></tr>
@@ -191,7 +192,8 @@
   <tr><td>Operaciones matemáticas, secuencias, palabras y frases</td><td>Planeadas</td><td class="no">Trabajo futuro</td></tr>
   <tr><td>Retos de memoria y laberinto (adulto y adulto mayor)</td><td>Planeados</td><td class="no">Trabajo futuro</td></tr>
   <tr><td>Reto «contrarreloj»</td><td>Planeado para aritmética</td><td class="no">Trabajo futuro (hoy el tiempo se muestra en el HUD pero no limita el juego)</td></tr>
-  <tr><td>Voz guía de cada letra y número</td><td>—</td><td class="part">Preparada: se activa al agregar los audios</td></tr>
+  <tr><td>Voz de cada letra</td><td>—</td><td class="ok">Suena al empezar el ejercicio (vocales y consonantes); los números aún no tienen audio</td></tr>
+  <tr><td>Niveles (paso del nivel 1 al 2)</td><td>—</td><td class="part">Nivel 1 completo con portal y plataforma; el nivel 2 está en construcción</td></tr>
 </table>
 <div class="note">Las escenas de retos futuros (<code>MathOperation</code>, <code>Maze</code>, <code>Memory</code>, <code>PlatformJump</code>) existen en el repositorio como esqueletos, pero se excluyeron de la compilación del PMV final para no mostrar contenido vacío. Los patrones «máquina de estados» (<code>GameFlowManager</code>) y «método plantilla» (<code>ChallengeBase</code>) de la versión anterior quedan como base para esos retos futuros: en esta versión el flujo entre escenas lo resuelven el menú, el cargador de escenas y las propias pantallas.</div>
 

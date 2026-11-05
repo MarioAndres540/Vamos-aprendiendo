@@ -48,8 +48,16 @@ namespace VamosAprendiendo.EditorTools
             panelImg.raycastTarget = false;
 
             var nameLabel = NewText("Name", panel, 52f, FontStyles.Bold, new Color(1f, 0.93f, 0.75f), TextAlignmentOptions.MidlineLeft);
-            Place(nameLabel.rectTransform, new Vector2(30f, -14f), new Vector2(-30f, -74f));
+            Place(nameLabel.rectTransform, new Vector2(30f, -14f), new Vector2(-200f, -74f));   // deja sitio al nivel, a la derecha
             nameLabel.text = "Jugador";
+
+            var levelLabel = NewText("Level", panel, 34f, FontStyles.Bold, new Color(1f, 0.78f, 0.2f), TextAlignmentOptions.MidlineRight);
+            levelLabel.rectTransform.anchorMin = new Vector2(1f, 1f);
+            levelLabel.rectTransform.anchorMax = new Vector2(1f, 1f);
+            levelLabel.rectTransform.pivot = new Vector2(1f, 1f);
+            levelLabel.rectTransform.anchoredPosition = new Vector2(-30f, -22f);
+            levelLabel.rectTransform.sizeDelta = new Vector2(190f, 50f);
+            levelLabel.text = "NIVEL 1";
 
             var barBack = NewRect("Xp_Back", panel);
             Place(barBack, new Vector2(30f, 62f), new Vector2(-30f, 112f), fromBottom: true);
@@ -85,6 +93,7 @@ namespace VamosAprendiendo.EditorTools
             so.FindProperty("nameLabel").objectReferenceValue = nameLabel;
             so.FindProperty("fill").objectReferenceValue = fillImg;
             so.FindProperty("xpLabel").objectReferenceValue = xpLabel;
+            so.FindProperty("levelLabel").objectReferenceValue = levelLabel;
             so.FindProperty("timeLabel").objectReferenceValue = timeLabel;
             so.ApplyModifiedProperties();
 

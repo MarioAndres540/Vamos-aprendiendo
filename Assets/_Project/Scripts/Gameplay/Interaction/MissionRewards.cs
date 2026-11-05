@@ -179,7 +179,7 @@ namespace VamosAprendiendo.Gameplay
 
         // ---------- claves ----------
 
-        private static string Scope()
+        public static string Scope()
         {
             var session = PlayerSession.Instance;
             string user = session != null && session.CurrentUser != null && !string.IsNullOrEmpty(session.CurrentUser.id)

@@ -17,6 +17,8 @@ namespace VamosAprendiendo.UI
         [SerializeField] private TMP_Text nameLabel;
         [SerializeField] private Image fill;
         [SerializeField] private TMP_Text xpLabel;
+        [Tooltip("Nivel del jugador (\"NIVEL 1\"), al final de la fila del nombre")]
+        [SerializeField] private TMP_Text levelLabel;
         [Tooltip("Tiempo de juego de esta sesión (desde que la cuenta entró a la app)")]
         [SerializeField] private TMP_Text timeLabel;
         [Tooltip("Segundos que tarda la barra y el número en llegar al valor nuevo")]
@@ -36,7 +38,9 @@ namespace VamosAprendiendo.UI
         private void OnEnable()
         {
             MissionRewards.Changed += OnClaimed;
+            PlayerLevel.Changed += OnLevelChanged;
             Refresh();
+            ShowLevel();
             EnsureClock();
             ShowTime();
         }
@@ -78,6 +82,7 @@ namespace VamosAprendiendo.UI
         private void OnDisable()
         {
             MissionRewards.Changed -= OnClaimed;
+            PlayerLevel.Changed -= OnLevelChanged;
             _animation = null;
         }
 
@@ -118,12 +123,24 @@ namespace VamosAprendiendo.UI
                 foreach (var id in MissionRewards.ClaimedGlyphIds()) claimedIds.Add(ProgressSyncService.ExerciseId(id));
                 xp = XpService.SumByIds(summary, claimedIds);
             }
-            int total = MissionRewards.TotalExercises();
-            float fraction = total > 0 ? Mathf.Clamp01((float)MissionRewards.ClaimedCount() / total) : 0f;
+            // La barra mide la experiencia lograda sobre la que da todo el nivel 1 (p. ej. 40 / 640); en el nivel 2 queda llena
+            int level1Xp = PlayerLevel.Level1Xp;
+            float fraction = PlayerLevel.Level >= 2 ? 1f : (level1Xp > 0 ? Mathf.Clamp01((float)xp / level1Xp) : 0f);
             SetTargets(xp, fraction, offline: false);
         }
 
         private void OnClaimed() => StartCoroutine(Load());
+
+        private void OnLevelChanged()
+        {
+            ShowLevel();
+            StartCoroutine(Load());
+        }
+
+        private void ShowLevel()
+        {
+            if (levelLabel != null) levelLabel.text = "NIVEL " + PlayerLevel.Level;
+        }
 
         private void SetTargets(int xp, float fraction, bool offline)
         {
@@ -158,7 +175,9 @@ namespace VamosAprendiendo.UI
         private void Draw()
         {
             if (fill != null) fill.fillAmount = _shownFill;
-            if (xpLabel != null) xpLabel.text = _shownXp + " XP";
+            if (xpLabel == null) return;
+            // En el nivel 1 se muestra cuánto falta para completarlo: "40 / 640 XP"
+            xpLabel.text = PlayerLevel.Level < 2 ? $"{Mathf.Min(_shownXp, PlayerLevel.Level1Xp)} / {PlayerLevel.Level1Xp} XP" : _shownXp + " XP";
         }
 
         public static string ResolveName()

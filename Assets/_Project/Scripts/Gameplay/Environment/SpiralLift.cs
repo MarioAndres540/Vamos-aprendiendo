@@ -47,6 +47,12 @@ namespace VamosAprendiendo.Gameplay
         private Vector3 _riderOffset; // desplazamiento horizontal del jugador respecto al centro al subirse
         private float _centerBlend;
 
+        /// <summary>Mientras está bloqueada no sube a nadie (el nivel siguiente todavía no se abrió).</summary>
+        public bool Locked { get; set; }
+
+        /// <summary>Se dispara cuando la plataforma llega a la cima con el jugador a bordo.</summary>
+        public event System.Action ReachedEnd;
+
         [SerializeField, HideInInspector] private string originalName;
         [SerializeField, HideInInspector] private Vector3 originalCenter;
 
@@ -170,6 +176,7 @@ namespace VamosAprendiendo.Gameplay
             switch (_state)
             {
                 case State.AtStart:
+                    if (Locked) { _boardTimer = 0f; break; }
                     if (BoardedLongEnough()) StartRide(State.Ascending);
                     break;
 
@@ -214,11 +221,13 @@ namespace VamosAprendiendo.Gameplay
             bool arrived = direction > 0f ? _s >= _total - 0.01f : _s <= 0.01f;
             if (arrived)
             {
+                bool carriedPlayer = _riding;
                 ReleasePlayer();
                 _state = finishedState;
                 _boardTimer = 0f;
                 _idleTimer = 0f;
                 _requireLeave = true;
+                if (finishedState == State.AtEnd && carriedPlayer) ReachedEnd?.Invoke();
             }
         }
 
