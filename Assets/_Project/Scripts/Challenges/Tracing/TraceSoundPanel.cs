@@ -22,6 +22,8 @@ namespace VamosAprendiendo.Challenges.Tracing
         [SerializeField] private Slider volumeSlider;
         [SerializeField] private TMP_Text volumeLabel;
         [SerializeField] private AudioClip musicClip;
+        [Tooltip("Voces de las letras. Si falta, se busca Resources/LetterVoices (Tools/Audio/Build Letter Voice Library)")]
+        [SerializeField] private LetterVoiceLibrary voices;
         [SerializeField] private Color selectedColor = new Color32(0xDD, 0xD6, 0xFF, 255);
         [SerializeField] private Color normalColor = new Color32(0xF1, 0xEF, 0xFF, 255);
 
@@ -53,7 +55,9 @@ namespace VamosAprendiendo.Challenges.Tracing
                 volumeSlider.onValueChanged.AddListener(OnVolumeChanged);
             }
 
-            _mode = (TraceSoundMode)Mathf.Clamp(PlayerPrefs.GetInt(ModeKey, 0), 0, 2);
+            if (voices == null) voices = Resources.Load<LetterVoiceLibrary>("LetterVoices");
+            // Por defecto suena la voz de la letra al empezar el ejercicio; quien prefiera silencio lo elige y se recuerda
+            _mode = (TraceSoundMode)Mathf.Clamp(PlayerPrefs.GetInt(ModeKey, (int)TraceSoundMode.Voice), 0, 2);
         }
 
         private void Start() => Apply();
@@ -104,7 +108,8 @@ namespace VamosAprendiendo.Challenges.Tracing
         /// <summary>Lee en voz alta la letra o el número. Devuelve false si todavía no hay audio para ese ejercicio.</summary>
         public bool PlayVoice(string glyphId)
         {
-            var clip = Resources.Load<AudioClip>("Voice/" + glyphId);
+            var clip = voices != null ? voices.GetClip(glyphId) : null;
+            if (clip == null) clip = Resources.Load<AudioClip>("Voice/" + glyphId);
             if (clip == null) return false;
             _voice.Stop();
             _voice.clip = clip;
@@ -113,10 +118,10 @@ namespace VamosAprendiendo.Challenges.Tracing
             return true;
         }
 
-        /// <summary>Con la voz guía activa, al mostrar cada forma se lee sola.</summary>
+        /// <summary>Al empezar el ejercicio suena la letra, salvo que el jugador haya elegido Silencio.</summary>
         public void OnGlyphShown(string glyphId)
         {
-            if (_mode == TraceSoundMode.Voice) PlayVoice(glyphId);
+            if (_mode != TraceSoundMode.Silence) PlayVoice(glyphId);
         }
     }
 }

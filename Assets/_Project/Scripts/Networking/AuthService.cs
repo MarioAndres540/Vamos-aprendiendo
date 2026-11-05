@@ -18,13 +18,16 @@ public class AuthService : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
-    // TEMPORAL (sin servidor): usuario de pruebas que entra sin validar contra el backend.
-    // Quitar o proteger con #if UNITY_EDITOR || DEVELOPMENT_BUILD antes de publicar.
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+    // Usuario de pruebas que entra sin validar contra el backend. Solo existe en el Editor y en compilaciones
+    // de desarrollo: las compilaciones de entrega (Build Windows / Build Android APK) no lo incluyen.
     private const string OfflineTestUser = "test";
     private const string OfflineTestPassword = "test1";
+#endif
 
     public void Login(string email, string password, Action<LoginResponseDto> onSuccess, Action<string> onError)
     {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
         if (string.Equals(email, OfflineTestUser, StringComparison.OrdinalIgnoreCase) && password == OfflineTestPassword)
         {
             // Se comporta como un tester: sin audience, la app deja elegir la versión (niños o adultos)
@@ -33,6 +36,7 @@ public class AuthService : MonoBehaviour
             onSuccess?.Invoke(new LoginResponseDto { user = user });
             return;
         }
+#endif
 
         var requestBody = new LoginRequestDto{email = email, password = password};
 

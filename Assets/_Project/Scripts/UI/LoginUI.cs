@@ -30,8 +30,9 @@ namespace VamosAprendiendo.UI
         [SerializeField] private Button googleLoginButton;
         [SerializeField] private Button appleLoginButton;
         [SerializeField] private Button registerButton;
-        [Tooltip("Página web donde se hace el registro (el tutor llena sus datos y los de su hijo). Se abre en el navegador del dispositivo. Vacío: aún no está publicada.")]
+        [Tooltip("Página web donde se hace el registro (el tutor llena sus datos y los de su hijo). Se abre en el navegador del dispositivo. Vacío: usa la página publicada (DefaultRegisterUrl).")]
         [SerializeField] private string registerUrl = "";
+        private const string DefaultRegisterUrl = "https://frontend-vamos-aprendiendo.vercel.app/register";
 
         [Header("Feedback / Toast")]
         [SerializeField] private TMP_Text feedbackText;
@@ -325,15 +326,16 @@ namespace VamosAprendiendo.UI
         /// </summary>
         private void OpenRegistration()
         {
-            bool valid = !string.IsNullOrWhiteSpace(registerUrl)
-                         && (registerUrl.StartsWith("https://") || registerUrl.StartsWith("http://"));
+            // Si el campo del Inspector está vacío se usa la página web publicada
+            string url = string.IsNullOrWhiteSpace(registerUrl) ? DefaultRegisterUrl : registerUrl.Trim();
+            bool valid = url.StartsWith("https://") || url.StartsWith("http://");
             if (!valid)
             {
                 ShowFeedback("El registro se hace en nuestra página web. Estará disponible muy pronto.");
                 return;
             }
             ShowFeedback("Abriendo el registro en tu navegador. Cuando termines, inicia sesión aquí.");
-            Application.OpenURL(registerUrl.Trim());
+            Application.OpenURL(url);
         }
 
         public void TogglePasswordVisibility()

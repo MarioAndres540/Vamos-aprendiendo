@@ -89,3 +89,6 @@ crashlytics-build.properties
 # Autoguardados de recuperación del editor (no deben versionarse)
 /Assets/_Recovery/
 /Assets/_Recovery.meta
+
+# Caché temporal de compilación de Android (se regenera en cada build)
+/.utmp/

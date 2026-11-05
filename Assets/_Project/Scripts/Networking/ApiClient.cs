@@ -21,18 +21,53 @@ public class ApiClient : MonoBehaviour
         ApplyConfiguredUrl();
     }
 
+    /// <summary>Clave (EditorPrefs) del entorno elegido en el Editor: 0 = local, 1 = producción. Ver Tools/Backend.</summary>
+    public const string EditorEnvironmentKey = "Vamos.BackendEnvironment";
+
+    /// <summary>Dirección y entorno en uso, para mostrarlos (por ejemplo en la insignia de pruebas).</summary>
+    public string BaseUrl => baseUrl;
+    public string EnvironmentName { get; private set; } = "escena";
+
     /// <summary>
-    /// Si existe Resources/api_base_url.txt (una línea con la dirección pública del backend, p. ej. https://api.midominio.com/api/v1)
-    /// se usa esa en lugar de la de la escena. Así una compilación apunta al servidor publicado sin tocar escenas; sin el archivo
-    /// se usa la de la escena (localhost en el Editor). Se crea con Tools/Build/Set Backend URL from Clipboard.
+    /// Elige el backend. En una compilación se usa la dirección de Resources/api_base_url.txt (el servidor publicado) si existe, y si
+    /// no la de la escena. En el Editor se elige con Tools/Backend: Local (la dirección de la escena, localhost) o Producción (la del
+    /// archivo), para validar contra los dos antes de compilar. El archivo se crea con Tools/Build/Set Backend URL from Clipboard.
     /// </summary>
     private void ApplyConfiguredUrl()
     {
+#if UNITY_EDITOR
+        if (UnityEditor.EditorPrefs.GetInt(EditorEnvironmentKey, 0) == 0)
+        {
+            EnvironmentName = "LOCAL";
+            Debug.Log($"[Api] Entorno LOCAL: {baseUrl}");
+            return;
+        }
+#endif
         var config = Resources.Load<TextAsset>("api_base_url");
-        if (config == null) return;
+        if (config == null)
+        {
+            Debug.Log($"[Api] Entorno (escena): {baseUrl}");
+            return;
+        }
         string url = config.text.Trim().TrimEnd('/');
-        if (url.StartsWith("http://") || url.StartsWith("https://")) baseUrl = url;
+        if (url.StartsWith("http://") || url.StartsWith("https://"))
+        {
+            baseUrl = url;
+            EnvironmentName = "PRODUCCIÓN";
+            Debug.Log($"[Api] Entorno PRODUCCIÓN: {baseUrl}");
+            // Un servidor publicado en un plan gratuito se duerme y tarda en despertar: se le avisa de entrada, sin esperar la respuesta
+            StartCoroutine(WarmUp());
+        }
         else Debug.LogWarning("[Api] api_base_url.txt no trae una dirección http(s) válida: se ignora.");
+    }
+
+    private IEnumerator WarmUp()
+    {
+        using (var request = UnityWebRequest.Get(baseUrl))
+        {
+            request.timeout = 60;
+            yield return request.SendWebRequest();
+        }
     }
 
     /// <summary>POST con cuerpo serializado por JsonUtility y respuesta tipada (login, etc.).</summary>
@@ -104,7 +139,9 @@ public class ApiClient : MonoBehaviour
         var request = new UnityWebRequest($"{baseUrl}{endpoint}", method)
         {
             downloadHandler = new DownloadHandlerBuffer(),
-            timeout = timeoutSeconds
+            // El backend gratuito de Render se duerme tras 15 min sin uso y la primera petición tarda ~1 min:
+            // contra un servidor público se espera más de lo que dice la escena (10 s) para no fallar en frío.
+            timeout = baseUrl.Contains("localhost") ? timeoutSeconds : Mathf.Max(timeoutSeconds, 75)
         };
 
         // GET sin cuerpo: en Android e iOS una petición GET con cuerpo puede fallar

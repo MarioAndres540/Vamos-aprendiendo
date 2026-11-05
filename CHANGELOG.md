@@ -8,6 +8,13 @@ El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1
 
 ## [Unreleased] - Por Desarrollar
 
+### Agregado — Voces de las letras y elección de backend en el Editor (2026-11-05)
+- **Voz de cada letra al empezar el ejercicio:** `LetterVoiceLibrary` (`Resources/LetterVoices.asset`, generada con `Tools/Audio/Build Letter Voice Library`) liga las 27 voces (5 vocales y 22 consonantes, la misma para mayúscula y minúscula). Al abrir una forma suena sola en cualquier modo de sonido salvo Silencio; el modo por defecto es Voz guía. Los números no tienen audio todavía.
+- **Los `.ogg` entregados estaban en formato Opus**, que Unity no importa (solo Vorbis): se convirtieron a WAV mono (con recorte de silencios) en las mismas carpetas y se importan comprimidos en Vorbis. Los originales quedaron en `Docs/Audio_originales_opus/`.
+- **Backend por entorno en el Editor:** `Tools/Backend/Editor usa backend LOCAL` o `... de PRODUCCIÓN` (por defecto local; las compilaciones siguen usando `Resources/api_base_url.txt`). Insignia en la esquina inferior izquierda con el entorno activo (solo Editor y compilaciones de desarrollo). En producción se "despierta" el servidor al iniciar (los planes gratuitos se duermen).
+- **Base de datos:** se aplicó la migración `xp_claims` (columna `xp_ledger.claimed_at` e índice) en Supabase; las 27 filas de experiencia existentes quedaron por cobrar.
+- `.utmp/` (caché de compilación de Android) salió del control de versiones.
+
 ### Cambiado — GDD alineado con el PMV 3 y limpieza del repositorio (2026-11-04)
 - `Docs/GDD_Vamos_Aprendiendo` (.html y .pdf) actualizado como versión 4.0 con los datos reales del PMV 3 y la bitácora (autor, centro, ficha, instructor, repositorios, herramientas de IA, requisitos del sistema, versiones e incidencias) y los cambios de esta fase.
 - **Bug 3 de la bitácora (Cinemachine):** se retiraron de `BaseScene` los 4 componentes de Cinemachine que quedaron sin paquete (Main Camera y CinemachineCamera); la cámara usa `SmoothThirdPersonCamera`. Ninguna escena de la compilación tiene scripts faltantes.
