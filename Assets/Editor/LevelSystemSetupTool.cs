@@ -77,11 +77,61 @@ namespace VamosAprendiendo.EditorTools
             string[] celebration = { "Magic circles/Magic circle 2.prefab", "Sparks/Sparks explode yellow.prefab", "Hits and explosions/Holy hit.prefab" };
             fx.arraySize = celebration.Length;
             for (int i = 0; i < celebration.Length; i++) fx.GetArrayElementAtIndex(i).objectReferenceValue = LoadFx(celebration[i]);
+            so.FindProperty("platformAuraPrefab").objectReferenceValue = LoadFx("Magic circles/Healing circle.prefab");
+            so.FindProperty("platformBurstPrefab").objectReferenceValue = LoadFx("Sparks/Sparks explode yellow.prefab");
             so.ApplyModifiedProperties();
+
+            var material = BuildPlatformMaterial();
+            if (material != null)
+                foreach (var renderer in lift.GetComponentsInChildren<Renderer>(true))
+                {
+                    Undo.RecordObject(renderer, "Level platform material");
+                    var shared = new Material[renderer.sharedMaterials.Length];
+                    for (int i = 0; i < shared.Length; i++) shared[i] = material;
+                    renderer.sharedMaterials = shared;
+                }
 
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
-            Debug.Log($"[Level] Listo. Portal cerrado hasta completar el nivel 1; plataforma verde bloqueada hasta cruzarlo; regreso al frente del pulpo en {front.transform.position:F1}.");
+            Debug.Log($"[Level] Listo. Portal cerrado hasta completar el nivel 1; plataforma bloqueada hasta cruzarlo; regreso al frente del pulpo en {front.transform.position:F1}.");
+        }
+
+        private const string PlatformMaterialPath = "Assets/_Project/Art/Materials/M_LevelPlatform.mat";
+        private const string GrassMudDir = "Assets/_ThirdParty/Textures/Blink/Art/Textures/StylizedForestTextures/Grass_Mud/";
+
+        // Material de la plataforma: URP/Lit con las texturas de césped y tierra (color, relieve y oclusión) y un brillo verde suave,
+        // en lugar del material plano sin luz que tenía.
+        private static Material BuildPlatformMaterial()
+        {
+            var shader = Shader.Find("Universal Render Pipeline/Lit");
+            if (shader == null) { Debug.LogWarning("[Level] No se encontró el shader URP/Lit."); return null; }
+
+            var material = AssetDatabase.LoadAssetAtPath<Material>(PlatformMaterialPath);
+            if (material == null)
+            {
+                material = new Material(shader);
+                AssetDatabase.CreateAsset(material, PlatformMaterialPath);
+            }
+            material.shader = shader;
+
+            var baseMap = AssetDatabase.LoadAssetAtPath<Texture2D>(GrassMudDir + "Grass_Mud_Basecolor.png");
+            var normal = AssetDatabase.LoadAssetAtPath<Texture2D>(GrassMudDir + "Grass_Mud_Normal.png");
+            var occlusion = AssetDatabase.LoadAssetAtPath<Texture2D>(GrassMudDir + "Grass_Mud_Ambientocclusion.png");
+            material.SetTexture("_BaseMap", baseMap);
+            material.SetColor("_BaseColor", new Color(0.82f, 1f, 0.78f));
+            if (normal != null) { material.SetTexture("_BumpMap", normal); material.SetFloat("_BumpScale", 1f); material.EnableKeyword("_NORMALMAP"); }
+            if (occlusion != null) { material.SetTexture("_OcclusionMap", occlusion); material.EnableKeyword("_OCCLUSIONMAP"); }
+            material.SetFloat("_Smoothness", 0.35f);
+            material.SetFloat("_Metallic", 0f);
+            material.SetTextureScale("_BaseMap", new Vector2(2f, 2f));
+            material.SetTextureScale("_BumpMap", new Vector2(2f, 2f));
+            material.SetTextureScale("_OcclusionMap", new Vector2(2f, 2f));
+            material.EnableKeyword("_EMISSION");
+            material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.None;
+            material.SetColor("_EmissionColor", new Color(0.15f, 0.9f, 0.35f) * 0.6f);
+            EditorUtility.SetDirty(material);
+            AssetDatabase.SaveAssets();
+            return material;
         }
 
         // Punto firme frente al pulpo: se prueba alrededor de él (primero hacia donde mira) y se queda con el primero con suelo cerca

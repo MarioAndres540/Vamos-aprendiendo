@@ -5,7 +5,7 @@ namespace VamosAprendiendo.Gameplay
 {
     /// <summary>
     /// Portal del nivel 1. Cerrado (apagado) hasta que el jugador cobra la experiencia de todas las actividades; entonces se
-    /// enciende y, al cruzarlo, activa la plataforma verde que sube al nivel 2. Si se intenta cruzar cerrado, avisa cuánto falta.
+    /// enciende y, al cruzarlo, activa la plataforma que sube al nivel 2. Si se intenta cruzar cerrado, avisa cuánto falta.
     /// </summary>
     [RequireComponent(typeof(Collider))]
     public class LevelPortal : MonoBehaviour
@@ -56,8 +56,10 @@ namespace VamosAprendiendo.Gameplay
 
             if (PlayerLevel.PortalPassed) return;
             PlayerLevel.MarkPortalPassed();
+            StartCoroutine(LevelService.Push());   // el nivel queda guardado en la base de datos
             if (openedBurstPrefab != null) Destroy(Instantiate(openedBurstPrefab, other.bounds.center, Quaternion.identity), 4f);
-            LevelToast.Show("¡Portal abierto!", "La plataforma verde ya está activa. ¡Súbete para ir al nivel 2!", 4f);
+            LevelToast.Show("¡Felicitaciones!",
+                "Terminaste esta primera parte de tu progreso. Ahora sube en esa plataforma para llegar al siguiente nivel.", 6f);
         }
     }
 }

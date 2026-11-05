@@ -8,6 +8,12 @@ El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1
 
 ## [Unreleased] - Por Desarrollar
 
+### Cambiado — Nivel en la base de datos, mensaje, efecto y material de la plataforma (2026-11-05)
+- **El nivel se guarda en la base de datos**, no solo en el dispositivo: `LevelService` lee y guarda con `GET/PUT /telemetry/level` (por cuenta e hijo). En el dispositivo queda una copia para jugar sin conexión; el avance hecho sin conexión queda pendiente y se envía en la siguiente sincronización. El servidor manda: solo deja avanzar con las 64 actividades cobradas y el nivel nunca baja.
+- **Mensaje del portal:** ya no habla de plataforma verde. Dice «Felicitaciones. Terminaste esta primera parte de tu progreso. Ahora sube en esa plataforma para llegar al siguiente nivel.»
+- **Efecto:** al abrirse el portal la plataforma recibe un destello y un círculo mágico (Hovl «Healing circle») que viaja con ella mientras está activa.
+- **Material:** la plataforma pasa del plano sin luz `floor 2` al nuevo `M_LevelPlatform` (URP/Lit con las texturas de «Grass_Mud»: color, relieve y oclusión, y un brillo verde suave).
+
 ### Agregado — Niveles: del nivel 1 al nivel 2 (2026-11-05)
 - **Barra de experiencia por nivel:** el HUD muestra la experiencia lograda sobre la que da todo el nivel 1 (`PlayerLevel.Level1Xp` = 64 ejercicios x 10 XP = 640), por ejemplo «40 / 640 XP», y al final de la tarjeta el nivel («NIVEL 1»).
 - **Portal cerrado hasta completar el nivel 1:** el portal azul de la primera isla (`LevelPortal`) está apagado hasta cobrar en el cofre las 64 actividades; si se intenta cruzar cerrado avisa «Portal cerrado… (x de 64)».
