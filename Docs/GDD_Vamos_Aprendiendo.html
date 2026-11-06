@@ -38,7 +38,7 @@
     <tr><th>Ficha</th><td>3070352</td></tr>
     <tr><th>Instructor</th><td>Alvaro Tellez</td></tr>
     <tr><th>Ciudad</th><td>Medellín — Antioquia</td></tr>
-    <tr><th>Versión del documento</th><td>4.0 (final) — actualiza la versión 3.0 del PMV 3 (10/09/2026)</td></tr>
+    <tr><th>Versión del documento</th><td>4.1 (final) — actualiza la versión 3.0 del PMV 3 (10/09/2026); incluye el despliegue en producción y la protección de datos</td></tr>
     <tr><th>Fecha</th><td>Noviembre de 2026</td></tr>
     <tr><th>Motor y pipeline</th><td>Unity 6000.3.11f1 · Universal Render Pipeline 17.3.0</td></tr>
   </table>
@@ -52,7 +52,11 @@
   <tr><td>Repositorio — juego (Unity)</td><td>https://github.com/MarioAndres540/Vamos-aprendiendo/tree/develop</td></tr>
   <tr><td>Repositorio — backend (NestJS + Supabase)</td><td>https://github.com/MarioAndres540/backend_vamos-aprendiendo/tree/develop</td></tr>
   <tr><td>Repositorio — frontend (Nuxt)</td><td>https://github.com/MarioAndres540/frontend-vamos-aprendiendo/tree/develop</td></tr>
+  <tr><td>Sitio web en producción (Vercel)</td><td>https://frontend-vamos-aprendiendo.vercel.app</td></tr>
+  <tr><td>API en producción (Render)</td><td>https://vamos-aprendiendo-api.onrender.com/api/v1</td></tr>
+  <tr><td>Política de tratamiento de datos</td><td>https://frontend-vamos-aprendiendo.vercel.app/data-policy</td></tr>
 </table>
+<div class="note">El backend está en el plan gratuito de Render: se duerme tras 15 minutos sin uso y la primera petición del día tarda cerca de un minuto en responder.</div>
 
 <h2>Contenido</h2>
 <ol class="toc">
@@ -64,7 +68,7 @@
   <li>HUD e indicadores</li>
   <li>Condiciones de inicio, victoria y reintento</li>
   <li>Interfaz, arte, iluminación y audio</li>
-  <li>Arquitectura técnica</li>
+  <li>Arquitectura técnica, despliegue y protección de datos</li>
   <li>Estado del alcance y cambios desde el PMV 3</li>
   <li>Registro de versiones e incidencias</li>
   <li>Pruebas y estabilidad</li>
@@ -83,7 +87,7 @@
   <tr><td>Plataformas</td><td>PC Standalone Windows (x86_64) como plataforma principal; Android (APK) como plataforma secundaria. WebGL queda como objetivo futuro.</td></tr>
   <tr><td>Entrada</td><td>New Input System: teclado, ratón y Gamepad XInput en PC; táctil (joystick virtual y botones en pantalla) en Android.</td></tr>
   <tr><td>Lenguaje y motor</td><td>C# · Unity 6000.3.11f1 · URP 17.3.0 · TextMesh Pro</td></tr>
-  <tr><td>Servicios</td><td>Backend NestJS + Supabase (PostgreSQL) y sitio web Nuxt con dashboard de seguimiento</td></tr>
+  <tr><td>Servicios</td><td>Backend NestJS en Render, base de datos y autenticación en Supabase (PostgreSQL) y sitio web Nuxt en Vercel con dashboard de seguimiento; los tres publicados en internet</td></tr>
 </table>
 <p><b>Vamos Aprendiendo</b> es una plataforma lúdico-educativa para grandes y chicos que quieren mejorar sus capacidades. El jugador explora un archipiélago de islas flotantes en 3D, se acerca al pulpo guía y elige una actividad. En la actividad aprende y practica el trazo de <b>letras</b> y <b>números</b> siguiendo un camino guiado; al terminar, abre un <b>cofre</b> que le entrega su experiencia (XP).</p>
 <p>Los más pequeños aprenden desde los números y las letras hasta distinguir objetos, formar frases completas y resolver operaciones matemáticas; para los más grandes se plantea una serie de retos que ejercitan la actividad cognitiva para mantener el cerebro activo cada día. En esta versión (PMV final) está completa la ruta de <b>números y letras</b>; el resto se describe como trabajo futuro (apartado 10).</p>
@@ -92,7 +96,9 @@
   <li>Aplicación para Windows y Android con registro web, inicio de sesión, menú principal (Jugar, Instructivo, Créditos), tutorial guiado y botón de ayuda.</li>
   <li>Mundo 3D de islas flotantes con control en tercera persona, portales, signos de misión («!» y «?») y cofre de experiencia.</li>
   <li>Actividad de trazo con validación (cobertura y exactitud), 64 ejercicios (números 0-9, vocales y 22 consonantes en mayúscula y minúscula).</li>
-  <li>HUD con nombre del jugador, experiencia y tiempo; telemetría real hacia el backend; dashboard web de progreso.</li>
+  <li>HUD con nombre del jugador, experiencia, nivel y tiempo; telemetría real hacia el backend; dashboard web de progreso.</li>
+  <li>Voz de cada vocal, consonante y número (0-9) al empezar el ejercicio, y paso del nivel 1 al nivel 2 mediante un portal y una plataforma (el nivel 2 está en construcción).</li>
+  <li>Sistema publicado: sitio web, API y base de datos en internet, con autorizaciones de tratamiento de datos conforme a la Ley 1581 de 2012 (apartado 9.3).</li>
 </ul>
 
 <h2>2. Público objetivo y objetivos pedagógicos</h2>
@@ -108,7 +114,7 @@
 <h2>3. Flujo general y navegación</h2>
 <p>Escenas incluidas en la compilación: <code>LoginScene</code> → <code>MainMenuScene</code> → <code>BaseScene</code> (mundo) → <code>ActivitySelect</code> («Tu ruta») → <code>LetterTrace_2D</code> / <code>NumberTrace_2D</code> (actividades de trazo).</p>
 <ol>
-  <li><b>Registro (web).</b> Quien se registra lo hace en la página web: llena el formulario de ingreso y, si es tutor, los datos de su hijo. Solo después puede ingresar a la app. En el login, el botón «Regístrate» abre esa página en el navegador del dispositivo.</li>
+  <li><b>Registro (web).</b> Quien se registra lo hace en la página web: llena el formulario de ingreso y, si es tutor, los datos de su hijo. Solo después puede ingresar a la app. En el login, el botón «Regístrate» abre esa página (<code>/register</code> del sitio publicado) en el navegador del dispositivo. El registro pide autorizaciones separadas de tratamiento de datos (apartado 9.3).</li>
   <li><b>Inicio de sesión.</b> Usuario y contraseña; si la cuenta es de un tutor con varios hijos, elige quién juega.</li>
   <li><b>Menú principal.</b> Saludo con el nombre del jugador y los botones <i>Jugar</i>, <i>Instructivo</i> (objetivo y controles, con «Ver el tutorial»), <i>Créditos</i> y <i>Cerrar sesión</i>.</li>
   <li><b>Tutorial.</b> La primera vez que entra al mundo (y cuando toca el botón «?»): tarjeta de bienvenida y una viñeta por control (joystick, cámara, salto, sonido, pausa). El juego queda detenido y no avanza hasta que el jugador usa ese control.</li>
@@ -125,7 +131,7 @@
   <li><b>TRAZA.</b> Con «Comenzar a trazar» se habilita el dibujo. Cada trazo tiene su número y flechas de dirección; «Paso x de n» indica el avance. Si el dedo se sale del camino, el trazo se descarta y se avisa para repetirlo.</li>
   <li><b>PRACTICA.</b> «Comprobar» evalúa el trazo (cobertura del camino y exactitud). Si aprueba, queda completo; si no, aparece «¡Ups! Intenta de nuevo» y puede reintentar.</li>
 </ol>
-<p><b>Sonido de apoyo:</b> Silencio, Música suave o Voz guía, con volumen ajustable; «Escuchar» lee la letra o el número cuando existe su audio.</p>
+<p><b>Sonido de apoyo:</b> Silencio, Música suave o Voz guía, con volumen ajustable; al empezar el ejercicio suena la voz de la letra o del número (excepto en Silencio), y «Escuchar» la repite.</p>
 <p>Cada intento (aprobado o no) se envía al backend con su cobertura y exactitud; el servidor decide si aprobó el ejercicio y lo registra una sola vez por estudiante. Si no hay conexión, los intentos se guardan en una cola local y se envían después.</p>
 <p><b>Exploración del mundo:</b> el jugador se mueve con un <code>CharacterController</code> (movimiento unificado por frame y adherencia al suelo), con salto y cámara en tercera persona suavizada (<code>SmoothThirdPersonCamera</code>) que se orienta con el joystick o el ratón.</p>
 
@@ -135,7 +141,7 @@
   <li><b>Experiencia:</b> cada ejercicio aprobado vale 10 XP, una sola vez. La experiencia se <b>entrega al abrir el cofre</b>, no al aprobar: el HUD y el dashboard solo suman lo ya cobrado, y el dashboard avisa cuánto XP está por cobrar.</li>
   <li><b>Señales en el mundo:</b> «!» anuncia una misión nueva (al empezar o al terminar la ruta en curso); «?» indica experiencia por cobrar en el cofre.</li>
   <li><b>Tu ruta:</b> cada tarjeta muestra su porcentaje, una barra y una estrella al completarse.</li>
-  <li><b>Niveles:</b> el nivel 1 reúne las 64 actividades (640 XP). La barra de experiencia muestra el avance sobre ese total (por ejemplo «40 / 640 XP») y el nivel del jugador. Al cobrar toda la experiencia se abre el portal azul de la primera isla; al cruzarlo se activa la plataforma verde, que sube al jugador al nivel 2 con una celebración. El nivel 2 está en construcción: aparece un aviso y el personaje vuelve al frente del pulpo.</li>
+  <li><b>Niveles:</b> el nivel 1 reúne las 64 actividades (640 XP). La barra de experiencia muestra el avance sobre ese total (por ejemplo «40 / 640 XP») y el nivel del jugador. Al cobrar toda la experiencia se abre el portal azul de la primera isla; al cruzarlo se activa la plataforma verde, que sube al jugador al nivel 2 con una celebración. El nivel 2 está en construcción: aparece un aviso y el personaje vuelve al frente del pulpo. El nivel se guarda en la base de datos por cuenta e hijo (<code>GET/PUT /telemetry/level</code>), con una copia en el dispositivo para jugar sin conexión; el servidor manda: solo deja avanzar con las 64 actividades cobradas y el nivel nunca baja. El dashboard web todavía no muestra el nivel.</li>
 </ul>
 
 <h2>6. HUD e indicadores</h2>
@@ -180,6 +186,34 @@
 <p>El cliente de Unity se organiza en capas desacopladas, arrancadas por un <code>Bootstrapper</code> persistente (<code>DontDestroyOnLoad</code>) que garantiza los servicios de red en cualquier escena: <code>Core</code> (arranque y audio), <code>Gameplay</code> (jugador, cámara, entorno, interacción), <code>Challenges</code> (trazo y progreso), <code>UI</code> (menús, HUD, tutorial), <code>Networking</code> (API, autenticación, sincronización, experiencia) y <code>Profiles</code> (sesión del jugador).</p>
 <p>Patrones aplicados: <b>capa de servicios</b> (<code>ApiClient</code>, <code>AuthService</code>, <code>ProgressSyncService</code>, <code>XpService</code>), <b>DTOs</b> tipados para la serialización JSON, <b>observador / eventos</b> (<code>TraceProgress.Changed</code>, <code>MissionRewards.Changed</code>) y entrada por acciones del New Input System (la API legacy <code>UnityEngine.Input</code> está prohibida en el estándar de código). Convenciones: PascalCase en clases y métodos, <code>Awake()</code> para referencias internas y <code>Start()</code> para conectar con otros sistemas.</p>
 
+<h3>9.1 Despliegue en producción</h3>
+<table>
+  <tr><th>Componente</th><th>Servicio</th><th>Detalle</th></tr>
+  <tr><td>API (backend)</td><td>Render, servicio web Node (plan gratuito, región Virginia)</td><td>Se despliega desde la rama <code>develop</code> del repositorio del backend mediante un Blueprint (<code>render.yaml</code>). Los secretos JWT los genera Render; las claves de Supabase y los orígenes permitidos se cargan como variables de entorno del servicio, nunca en el repositorio.</td></tr>
+  <tr><td>Sitio web</td><td>Vercel (Nuxt)</td><td>Se publica desde la rama <code>develop</code> del repositorio del frontend. Variables públicas: dirección de la API y datos del responsable del tratamiento.</td></tr>
+  <tr><td>Base de datos y autenticación</td><td>Supabase (PostgreSQL 17)</td><td>36 tablas con seguridad a nivel de fila (RLS) activa; el backend accede con la llave secreta de servidor. La dirección del sitio está configurada como Site URL y Redirect URL de autenticación.</td></tr>
+  <tr><td>Juego (Unity)</td><td>Compilaciones Windows y Android</td><td>La dirección de la API se fija en <code>Resources/api_base_url.txt</code> al compilar (<code>Tools/Build</code>); en el Editor se elige backend local o de producción. Contra un servidor público, el cliente espera hasta 75 s por petición para tolerar el arranque en frío del plan gratuito.</td></tr>
+</table>
+<p><b>Verificación del despliegue (05/11/2026):</b> la API responde 200 con las cabeceras de seguridad activas (CSP, HSTS, <code>nosniff</code>, <code>X-Frame-Options</code>); CORS acepta solo el dominio del sitio publicado y rechaza otros orígenes; el sitio carga el inicio de sesión y la política de datos con los datos del responsable; el super administrador inicia sesión y ve el panel con la lista de usuarios y las solicitudes de datos personales.</p>
+
+<h3>9.2 Seguridad</h3>
+<ul>
+  <li><b>Secretos:</b> el backend no arranca sin <code>JWT_SECRET</code>, <code>JWT_REFRESH_SECRET</code> y <code>SUPABASE_URL</code>; en producción exige secretos de al menos 32 caracteres y distintos entre sí.</li>
+  <li><b>Límite de intentos</b> por IP y por minuto (inicio de sesión 10, registro 5, OAuth 10, renovación 30), cabeceras con <code>helmet</code>, CORS restringido y confianza en un solo proxy (Render) para obtener la IP real.</li>
+  <li><b>Cuenta de pruebas sin servidor:</b> el usuario de pruebas de la app, que entra sin validar contra el backend, solo existe en el Editor y en compilaciones de desarrollo; las compilaciones de entrega no lo incluyen.</li>
+  <li><b>Dependencias:</b> corregidas las vulnerabilidades altas y críticas de producción.</li>
+</ul>
+
+<h3>9.3 Protección de datos personales (Ley 1581 de 2012)</h3>
+<p>Como la plataforma trata datos de menores y datos sensibles (evaluación inicial), se implementó lo siguiente:</p>
+<ul>
+  <li><b>Política pública</b> en <code>/data-policy</code>, enlazada desde el login, el registro y la página de privacidad, con los datos del responsable del tratamiento.</li>
+  <li><b>Autorizaciones separadas y con prueba:</b> tratamiento de datos (obligatoria), datos de menores como representante legal (obligatoria para el tutor) y datos sensibles (opcional). Cada una se guarda con su versión, la IP y el navegador; si no se puede guardar la prueba, el registro se revierte.</li>
+  <li><b>Datos sensibles facultativos:</b> la evaluación inicial exige la autorización y se puede omitir sin guardar datos.</li>
+  <li><b>Derechos del titular</b> en la página <code>/privacy</code>: ver y revocar autorizaciones, descargar sus datos en JSON y radicar consultas y reclamos, con plazos en días hábiles (10 para consultas y 15 para reclamos).</li>
+  <li><b>Trámite por el super administrador:</b> panel de solicitudes con las vencidas marcadas, respuesta obligatoria y supresión por ecosistema en una sola transacción (borra los datos, anonimiza y desactiva la cuenta). Las acciones quedan en un registro de auditoría.</li>
+</ul>
+
 <h2>10. Estado del alcance y cambios desde el PMV 3</h2>
 <table>
   <tr><th>Elemento</th><th>PMV 3 (10/09/2026)</th><th>Versión final</th></tr>
@@ -192,8 +226,11 @@
   <tr><td>Operaciones matemáticas, secuencias, palabras y frases</td><td>Planeadas</td><td class="no">Trabajo futuro</td></tr>
   <tr><td>Retos de memoria y laberinto (adulto y adulto mayor)</td><td>Planeados</td><td class="no">Trabajo futuro</td></tr>
   <tr><td>Reto «contrarreloj»</td><td>Planeado para aritmética</td><td class="no">Trabajo futuro (hoy el tiempo se muestra en el HUD pero no limita el juego)</td></tr>
-  <tr><td>Voz de cada letra</td><td>—</td><td class="ok">Suena al empezar el ejercicio (vocales y consonantes); los números aún no tienen audio</td></tr>
-  <tr><td>Niveles (paso del nivel 1 al 2)</td><td>—</td><td class="part">Nivel 1 completo con portal y plataforma; el nivel 2 está en construcción</td></tr>
+  <tr><td>Voz de cada letra y número</td><td>—</td><td class="ok">Suena al empezar el ejercicio (5 vocales, 22 consonantes y números del 0 al 9)</td></tr>
+  <tr><td>Niveles (paso del nivel 1 al 2)</td><td>—</td><td class="part">Nivel 1 completo con portal y plataforma; el nivel se guarda en la base de datos; el nivel 2 está en construcción</td></tr>
+  <tr><td>Despliegue</td><td>Solo en el equipo de desarrollo</td><td class="ok">Publicado: API en Render, sitio en Vercel, datos en Supabase</td></tr>
+  <tr><td>Protección de datos (Ley 1581)</td><td>—</td><td class="ok">Política, autorizaciones con prueba, derechos del titular y trámite del super administrador</td></tr>
+  <tr><td>Seguridad</td><td>—</td><td class="ok">Secretos obligatorios, límite de intentos, cabeceras, CORS restringido</td></tr>
 </table>
 <div class="note">Las escenas de retos futuros (<code>MathOperation</code>, <code>Maze</code>, <code>Memory</code>, <code>PlatformJump</code>) existen en el repositorio como esqueletos, pero se excluyeron de la compilación del PMV final para no mostrar contenido vacío. Los patrones «máquina de estados» (<code>GameFlowManager</code>) y «método plantilla» (<code>ChallengeBase</code>) de la versión anterior quedan como base para esos retos futuros: en esta versión el flujo entre escenas lo resuelven el menú, el cargador de escenas y las propias pantallas.</div>
 
@@ -205,7 +242,7 @@
   <tr><td>0.2.0</td><td>2026-09-07</td><td>Corrección de la física del jugador, movimiento relativo a la cámara, ajuste del centro del CharacterController.</td></tr>
   <tr><td>0.3.0</td><td>2026-09-08</td><td>Pantalla de carga, salto, cámara avanzada, carrusel de personajes, escenas de desafíos.</td></tr>
   <tr><td>0.4.0</td><td>2026-09-09</td><td>Menú de pausa con Esc, material PBR del golem, faroles con emisión, migración completa al New Input System.</td></tr>
-  <tr><td>0.5.0 (final)</td><td>2026-10 / 2026-11</td><td>Inicio de sesión y conexión al backend; telemetría y experiencia; trazo guiado con validación; cofre y señales de misión; menú principal, tutorial y ayuda; HUD con experiencia y tiempo; animaciones de golems; ciclo de día y noche; texturas a 1024; compilación para Windows y Android.</td></tr>
+  <tr><td>0.5.0 (final)</td><td>2026-10 / 2026-11</td><td>Inicio de sesión y conexión al backend; telemetría y experiencia; trazo guiado con validación; cofre y señales de misión; menú principal, tutorial y ayuda; HUD con experiencia y tiempo; animaciones de golems; ciclo de día y noche; texturas a 1024; compilación para Windows y Android; voces de las letras; niveles con portal y plataforma; endurecimiento de seguridad; protección de datos (Ley 1581); despliegue en Render, Vercel y Supabase.</td></tr>
 </table>
 <h3>11.2 Incidencias de la bitácora técnica y su estado</h3>
 <table>
@@ -219,7 +256,8 @@
 
 <h2>12. Pruebas y estabilidad</h2>
 <ul>
-  <li><b>Backend:</b> 233 pruebas automatizadas en verde (autenticación, intentos, experiencia y cobro, progreso, módulo del profesor).</li>
+  <li><b>Backend:</b> 270 pruebas automatizadas en verde, en 27 suites (autenticación, intentos, experiencia y cobro, progreso, módulo del profesor, seguridad, protección de datos y CORS), ejecutadas el 05/11/2026.</li>
+  <li><b>Producción:</b> verificación manual del despliegue (apartado 9.1): respuesta de la API, cabeceras, CORS, política de datos e inicio de sesión del super administrador.</li>
   <li><b>Juego:</b> pruebas manuales en el Editor de cada flujo (login, menú, tutorial, trazo, cofre, pausa, sincronización); todas las escenas de la compilación sin scripts faltantes.</li>
   <li><b>Pendiente:</b> medir la estabilidad en dispositivos reales (sesiones largas, sin cierres inesperados) antes de la sustentación. <span class="pending">completar con el resultado de las pruebas en dispositivo</span></li>
 </ul>
@@ -231,7 +269,7 @@
   <tr><td>Usuario final — Android (.apk)</td><td>Android 7.1 (API 25) o superior · pantalla táctil · conexión a internet para iniciar sesión. <span class="pending">completar RAM y almacenamiento con la prueba en dispositivo</span></td></tr>
   <tr><td>Desarrollo (Editor)</td><td>Windows 10/11 de 64 bits · Intel i5 de 8.ª gen. / Ryzen 5 o superior · 8 GB de RAM (16 GB recomendado) · GTX 1050 / RX 560 o superior · 20 GB en SSD · Unity Hub + Editor 6000.3.11f1 + Visual Studio o Rider.</td></tr>
 </table>
-<div class="note">Se requiere el servidor (backend) publicado y accesible por internet. Los intentos hechos sin conexión se guardan en el dispositivo y se envían al recuperar la conexión.</div>
+<div class="note">Se requiere el servidor (backend) publicado y accesible por internet: https://vamos-aprendiendo-api.onrender.com/api/v1. Android bloquea las conexiones sin cifrar, por eso la dirección es https. Los intentos hechos sin conexión se guardan en el dispositivo y se envían al recuperar la conexión. Con el plan gratuito de Render, el primer ingreso del día puede tardar cerca de un minuto.</div>
 
 <h2>Anexo B — Manual de usuario</h2>
 <h3>B.1 Instalación</h3>
@@ -242,7 +280,7 @@
 <h3>B.2 Registro e inicio de sesión</h3>
 <ol>
   <li>En la pantalla de ingreso toque <b>Regístrate</b>: se abre la página de registro en el navegador.</li>
-  <li>Llene el formulario. Si es <b>tutor</b>, agregue también los datos de su hijo.</li>
+  <li>Llene el formulario. Si es <b>tutor</b>, agregue también los datos de su hijo, y marque las autorizaciones de tratamiento de datos (la de datos sensibles es opcional). La política completa está en la página «Tratamiento de datos».</li>
   <li>Vuelva a la app, escriba su usuario y contraseña y toque <b>Iniciar sesión</b>. Si tiene varios hijos, elija quién va a jugar.</li>
 </ol>
 <h3>B.3 Menú principal</h3>
@@ -271,6 +309,7 @@
 <h3>B.7 Solución de problemas</h3>
 <ul>
   <li><b>No puedo iniciar sesión:</b> compruebe la conexión a internet y que ya completó el registro en la web.</li>
+  <li><b>Tarda mucho en iniciar sesión:</b> si nadie usó el servidor en los últimos 15 minutos, la primera petición tarda cerca de un minuto; espere y no cierre la app.</li>
   <li><b>No suena nada:</b> revise el botón de sonido y el volumen del dispositivo.</li>
   <li><b>Quiero ver el tutorial otra vez:</b> toque el botón «?» o use «Ver el tutorial» en el Instructivo.</li>
 </ul>
@@ -283,7 +322,7 @@
   <tr><td>MCP de Blender ↔ Antigravity</td><td>Modelado 3D low-poly asistido por agente para la geometría del entorno, con un ciclo de refinamiento documentado (un cambio por prompt, anclaje numérico, respaldo previo y verificación).</td></tr>
   <tr><td>UnityMcpBridge</td><td>Automatización de tareas del editor de Unity (escenas, cámara, escalado del entorno, faroles).</td></tr>
   <tr><td>VARCO 3D</td><td>Texturizado asistido por IA de modelos de entorno (templo flotante, árbol de otoño, portal rúnico, estatua de águila): Base Color, Normal Map y materiales URP.</td></tr>
-  <tr><td>Claude Code (Anthropic)</td><td>Fase final: menú principal, tutorial, HUD, cofre y experiencia, pantalla de trazo, sincronización de progreso, animaciones de golems, herramientas de editor, endpoints y migraciones del backend, pruebas automatizadas, CHANGELOG y este documento.</td></tr>
+  <tr><td>Claude Code (Anthropic)</td><td>Fase final: menú principal, tutorial, HUD, cofre y experiencia, pantalla de trazo, sincronización de progreso, animaciones de golems, herramientas de editor, endpoints y migraciones del backend, endurecimiento de seguridad, protección de datos (Ley 1581), despliegue en Render y Vercel, pruebas automatizadas, CHANGELOG y este documento.</td></tr>
 </table>
 <p>Revisión humana: cada cambio se probó en el Editor y/o con pruebas automatizadas antes de confirmarse. <span class="pending">completar con otros usos de IA del equipo (imágenes, audio, textos), si los hubo</span></p>
 
@@ -295,6 +334,7 @@
   <tr><td>Estabilidad (95-98 %), sin cierres inesperados</td><td class="part">Por verificar</td><td>Falta la prueba en dispositivo (apartado 12).</td></tr>
   <tr><td>Arte 3D/2D, texturas 1024 × 1024, interfaz y audio integrados</td><td class="ok">Cumple</td><td>Tope de importación de 1024 en texturas 3D; audio y música integrados.</td></tr>
   <tr><td>HUD e indicadores (tiempo, estrellas, puntuación)</td><td class="ok">Cumple</td><td>Apartado 6.</td></tr>
+  <tr><td>Sistema publicado y datos personales protegidos</td><td class="ok">Cumple</td><td>Apartados 9.1 a 9.3: despliegue verificado y cumplimiento de la Ley 1581.</td></tr>
 </table>
 
 <h2>Créditos y licencias</h2>
