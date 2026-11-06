@@ -16,6 +16,7 @@ namespace VamosAprendiendo.EditorTools
         {
             "Assets/_Project/Audio/SFX/vocales",
             "Assets/_Project/Audio/SFX/consonantes",
+            "Assets/_Project/Audio/SFX/numeros",   // numero-0.wav... → clave "0"
         };
 
         [MenuItem("Tools/Audio/Build Letter Voice Library")]

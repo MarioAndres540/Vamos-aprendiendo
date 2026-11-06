@@ -41,12 +41,13 @@ namespace VamosAprendiendo.Challenges.Tracing
             _byLetter = null;
         }
 
-        /// <summary>Voz de un ejercicio por su id de glifo ("lo_a", "up_A", "up_Ñ"); null si no hay audio (por ejemplo los números).</summary>
+        /// <summary>Voz de un ejercicio por su id de glifo ("lo_a", "up_A", "up_Ñ"); null si no hay audio.</summary>
         public AudioClip GetClip(string glyphId)
         {
             if (string.IsNullOrEmpty(glyphId)) return null;
+            // Los números ("d_7") se guardan por su dígito ("7"); ninguna letra es un dígito, así que no se mezclan
             int underscore = glyphId.IndexOf('_');
-            if (underscore < 0 || glyphId.StartsWith("d_", StringComparison.Ordinal)) return null;
+            if (underscore < 0) return null;
 
             if (_byLetter == null)
             {
